@@ -4,6 +4,8 @@ ______
 
 ### An "assembly" language for Factorio combinators
 
+[Try it live!](https://qon.github.io/combinassembly/)
+
 Write simple "assembly" code, get a blueprint for a combinator network that can execute the code in Factorio!
 Combinassembly is not a general purpose HDL for generating arbitrary combinator networks, instead operations execute sequentially(ish). The assembler does not generate a binary for a CPU, each instruction is a combinator (or several) which computes the operation directly.
 
