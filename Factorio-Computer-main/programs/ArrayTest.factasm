@@ -1,0 +1,10 @@
+const three = 3
+const five = 5
+
+[0,1, 2 , three, 4, five]   
+len ( secondArrayLen ) [ 0, 10, 20, secondArrayLen, 40, fourthArrayLen, 60 ]
+@ [ 0 , 100 , 200 , 300 ]
+len(fourthArrayLen) @ [ 0, 1000, secondArrayLen, 3000, fourthArrayLen ]
+
+# secondArrayLen = 7
+# fourthArrayLen = 5

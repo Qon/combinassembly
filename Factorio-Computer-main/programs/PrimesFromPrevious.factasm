@@ -1,0 +1,28 @@
+const array = 32
+const arrayEnd = 140
+
+const regArrayEnd = l
+*regArrayEnd = arrayEnd
+
+*a = 2
+
+*i = array
+**i = *a
+
+*i = *i + 1
+
+loop:
+	*a = *a + 1
+	*j = array
+
+	check:
+	*b = *a % **j
+	if *b = 0 goto loop
+	*j = *j + 1
+	if *j < *i goto check
+
+	**i = *a
+	*i = *i + 1
+	if *i < *regArrayEnd goto loop
+
+halt

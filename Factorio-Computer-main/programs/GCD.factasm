@@ -1,0 +1,20 @@
+# Big numbers not supported by Assembler yet
+# *a = 1513512
+# *b = 17295432
+
+*a = 12936
+*c = 117
+*a = *a * *c
+
+*b = 12936
+*c = 1337
+*b = *b * *c
+
+loop:
+	*c = *a % *b
+	*a = *b
+	*b = *c
+if *b != 0 goto loop
+
+halt
+# end: goto end

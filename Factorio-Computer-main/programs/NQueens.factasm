@@ -1,0 +1,105 @@
+const size = 8
+const lastIndex = 7
+const diagSpan = 15
+
+const heights = 32
+const horizontals = 40
+const sumDiagonals = 48
+const diffDiagonals = 72
+
+const regHeights = c
+const regHorizontals = d
+const regSumDiagonals = e
+const regDiffDiagonals = f
+
+*regHeights = heights
+*regHorizontals = horizontals
+*regSumDiagonals = sumDiagonals
+*regDiffDiagonals = diffDiagonals
+
+
+# ----- Reset -----
+
+*i = 0
+resetHeights:
+	*a = *regHeights + *i
+	**a = 0 - 1
+	*i = *i + 1
+if *i < size goto resetHeights
+
+*i = 0
+resetHorizontals:
+	*a = *regHorizontals + *i
+	**a = 0
+	*i = *i + 1
+if *i < size goto resetHorizontals
+
+*i = 0
+resetSumDiagonals:
+	*a = *regSumDiagonals + *i
+	**a = 0
+	*i = *i + 1
+if *i < diagSpan goto resetSumDiagonals
+
+*i = 0 - lastIndex
+resetDiffDiagonals:
+	*a = *regDiffDiagonals + *i
+	**a = 0
+	*i = *i + 1
+if *i < size goto resetDiffDiagonals
+
+
+# ----- Bruteforce -----
+
+const hor = m
+const sumDiag = n
+const diffDiag = o
+*i = 0 # Vertical selection
+
+loop:
+	*a = *regHeights + *i
+	**a = **a + 1
+
+	*hor = *regHorizontals + **a
+	if **hor > 0 goto badImmediately
+
+	*sumDiag = *regSumDiagonals + **a
+	*sumDiag = *sumDiag + *i
+	if **sumDiag > 0 goto badImmediately
+
+	*diffDiag = *regDiffDiagonals - **a
+	*diffDiag = *diffDiag + *i
+	if **diffDiag > 0 goto badImmediately
+
+	**hor = 1
+	**sumDiag = 1
+	**diffDiag = 1
+
+	*i = *i + 1
+	if *i >= size halt
+	goto loop
+
+
+	badImmediately:
+
+	if **a < lastIndex goto loop
+	
+	cleanup:
+	**a = 0 - 1
+
+	*i = *i - 1
+	*a = *regHeights + *i
+	
+	*hor = *regHorizontals + **a
+	**hor = 0
+
+	*sumDiag = *regSumDiagonals + **a
+	*sumDiag = *sumDiag + *i
+	**sumDiag = 0
+
+	*diffDiag = *regDiffDiagonals - **a
+	*diffDiag = *diffDiag + *i
+	**diffDiag = 0
+
+	if **a < lastIndex goto loop
+	goto cleanup

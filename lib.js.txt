@@ -1,0 +1,659 @@
+/*
+  `binary_search_async` performs a binary search on a nondecreasing async (returns a promise) function `g` on integer indexes in the domain.
+  @param v: value that you search for.
+  @param {Array or Function} ga: The array `a` or the function `g` will be set to `ga` iff `ga` != null.
+  @param {Object} opt: Object holding all the other things you need for the
+    search. All options are optional. If neither `a` or `g` are provided (which means `ga` is null also) the
+    search will naturally not find v.
+  @returns Promise of index where v resides in the structure you search through.
+    Broken promises rejection value tells you the indexes of the value that is
+    immediatly higher than v. This will be `min` if all values are greater than `v`
+    and `max+1` if all values are lesser. Rejection value-1 then naturally tells
+    you the index of the immediatly smaller value compared to `v`.
+
+  Example calls:
+    binary_search_async(2, [0,2,5]) // Resolves to 1
+    binary_search_async(2, i=>[0,2,5][i], {max: 2}) // Resolves to 1
+    binary_search_async(2, lazylist(i=>[0,2,5][i], 3)) // Resolves to 1
+    binary_search_async(2, i=>Promise.resolve([0,2,5][i]), {max: 2}) // Resolves to 1
+    binary_search_async(3, [0,2,5]) // Rejects value 2
+    binary_search_async(3) // Rejects value 0
+    let a = [0,1,1]; a.splice(await binary_search_async(.5, a, {always_resolve: true}), 0, 0.5) // a: [0, 0.5, 1, 1]
+*/
+async function binary_search_async(v, ga, opt = {}) {
+  // console.log('binary_search_async()', {v,ga,opt})
+  let resolve, reject, bound = 1
+  let {
+    // Perform an exponential search. Better expected perf and less `g` calls when values >= v exist on low indexes of `a`.
+    // https://en.wikipedia.org/wiki/Exponential_search
+    exponential = false,
+    // Resolves the lowest matching index if true. If true, resolve immediatly when a match is found.
+    lowestmatch  = false, /// TODO not implemented
+    // Resolves rejection values instead. Will still reject if the getter promise is broken.
+    always_resolve = false,
+    // Array to search through. Only used to compute the default value of `g` and can be omitted.
+    a = (typeof ga === 'object' && ga != null ? ga : []),
+    // Get function. g(i) returns a Promise that the value at index `i` (in some structure) will be provided.
+    g = (typeof ga === 'function' ? ga : i=>a[i]),
+    // Less than comparison. Used to compare v with g(i) for some values `i`.
+    lt = (a,b)=>a<b,
+    // Max and min values to binary search on. Defines the domain for `g`. If `ga` is a function you should probably define `max` at least.
+    max = g.size != null ? g.size - 1 : a.length - 1,
+    min = 0
+  } = opt
+
+
+  return new Promise((res, rej)=>{
+    resolve = res
+    reject = rej;
+    // TODO make sure exponential search works with min != 0
+    ;(exponential ? e : f)()
+  })
+
+  async function e() {
+    let call_f = ()=>{[max, min] = [Math.min(min+bound, max), min + Math.floor((bound)/2)]; f()}
+    if (min+bound < max) {
+      try {
+        let m = await g(min+bound)
+        if (lt(m, v)) {
+          bound *= 2;
+          e()
+        } else call_f()
+      } catch (e) {reject(e)}
+    } else call_f()
+  }
+
+  async function f() {
+    if (max < min) return always_resolve && resolve(min) || reject(min)
+    let i = Math.floor(min + (max - min)/2)
+    try {
+      let m = await g(i)
+      if      (lt(m, v)) min = i + 1
+      else if (lt(v, m)) max = i - 1
+      else return resolve(i)
+      f()
+    } catch (e) {reject(e)}
+  }
+}
+
+function binary_search(ga, v, opt = {}) {
+  // console.log('bsearch()', {v,ga,opt})
+  let {
+    // Perform an exponential search. Better expected perf and less `g` calls when values >= v exist on low indexes of `a`.
+    // https://en.wikipedia.org/wiki/Exponential_search
+    exponential = false,
+    // Resolves the lowest matching index if true. If true, resolve immediatly when a match is found.
+    lowestmatch  = false, /// TODO not implemented
+    // Resolves rejection values instead. Will still reject if the getter promise is broken.
+    always_resolve = true,
+    // Array to search through. Only used to compute the default value of `g` and can be omitted.
+    a = (typeof ga === 'object' && ga != null ? ga : []),
+    // Get function. g(i) returns a Promise that the value at index `i` (in some structure) will be provided.
+    g = (typeof ga === 'function' ? ga : i=>a[i]),
+    // Less than comparison. Used to compare v with g(i) for some values `i`.
+    lt = (a,b)=>a < b,
+    // Max and min values to binary search on. Defines the domain for `g`. If `ga` is a function you should probably define `max` at least.
+    max = g.size != null ? g.size - 1 : a.length - 1,
+    min = 0
+  } = opt
+  let h = i=>Sync.resolve(g(i))
+
+  let resolve, reject
+  return sync((s, j)=>{
+    ;[resolve, reject] = [s, j]
+    // TODO make sure exponential search works with min != 0
+    if (exponential) return e(0)
+    f(min, max)
+  })
+
+  function e(bound) { // console.log(`e(${bound})`)
+    if (min + bound >= max) return f(min + Math.floor(bound / 2), Math.min(min + bound, max))
+    h(min + bound).then(m=>{
+      if (lt(m, v)) e(Math.max(1, bound * 2))
+      else f(min + Math.floor(bound / 2), Math.min(min + bound, max))
+    }, reject)
+  }
+
+  function f(min, max) { // console.log(`f(${min}, ${max})`)
+    if (max < min) return always_resolve && resolve(min) || reject(min)
+    let i = Math.floor(min + (max - min)/2)
+    h(i).then(m=>{
+      if      (lt(m, v)) return f(i + 1, max)
+      else if (lt(v, m)) return f(min, i - 1)
+      resolve(i)
+    }, reject)
+  }
+}
+
+/* Exporting for Node.js without breaking WebExt */
+if (!globalThis.module) globalThis.module = {}
+module.exports = {binary_search, binary_search_async};
+
+/* Importing for Node.js and WebExt without breaking the other */
+/* or not!?!?? doesn't work D: */
+// let required = require('./Sync.js', {local: '/lib/internal'})
+// if (!(required instanceof Promise)) for (const k in required) globalThis[k] = required[k];
+// required
+require('./Sync.js', {local: '/lib/internal'})
+
+/*/
+{
+  // Test cases might be a bit outdated!
+  let required = require('./Sync.js', {local: '/lib/internal'})
+  if (!(required instanceof Promise)) for (const k in required) globalThis[k] = required[k]
+  required
+
+  // console.log(binary_search(i=>{console.log(`X ${i}`); return i}, 0, {max: 5, exponential: true}))
+
+  let fails = []
+  Promise.reject(null).catch(val=>{
+    return binary_search_async( 5)}).catch(val=>{fails.push(val);
+    return binary_search_async( 5, [ ])}).catch(val=>{fails.push(val);
+    return binary_search_async( 5, [ 0])}).catch(val=>{fails.push(val);
+    return binary_search_async( 5, [ 0,1])}).catch(val=>{fails.push(val);
+    return binary_search_async( 5, [ 0,1,2])}).catch(val=>{fails.push(val);
+    return binary_search_async( 5, [ 0,1,2,3])}).catch(val=>{fails.push(val);
+    return binary_search_async(-5, [ ])}).catch(val=>{fails.push(val);
+    return binary_search_async(-5, [ 0])}).catch(val=>{fails.push(val);
+    return binary_search_async(-5, [ 0,1])}).catch(val=>{fails.push(val);
+    return binary_search_async(-5, [ 0,1,2])}).catch(val=>{fails.push(val);
+    return binary_search_async(-5, [ 0,1,2,3])}).catch(val=>{fails.push(val);
+    return binary_search_async( 0, [ 1,2,3])}).catch(val=>{fails.push(val);
+    return binary_search_async( 1, [ 0,2,3])}).catch(val=>{fails.push(val);
+    return binary_search_async( 2, [ 0,1,3])}).catch(val=>{fails.push(val);
+    return binary_search_async( 3, [ 0,1,2])}).catch(val=>{fails.push(val);
+      console.log('All rejected that should', fails)})
+
+  Promise.all([
+    binary_search_async(0, [ 0]),
+    binary_search_async(0, [ 0,1]),
+    binary_search_async(1, [ 0,1]),
+    binary_search_async(0, [ 0,1,2]),
+    binary_search_async(1, [ 0,1,2]),
+    binary_search_async(2, [ 0,1,2]),
+    binary_search_async(0, [ 0,1,2,3,4]),
+    binary_search_async(1, [ 0,1,2,3,4]),
+    binary_search_async(2, [ 0,1,2,3,4]),
+    binary_search_async(3, [ 0,1,2,3,4]),
+    binary_search_async(4, [ 0,1,2,3,4]),
+    binary_search_async(2, i=>[0,2,5][i], {max: 2}),
+    binary_search_async(true, i=>Promise.resolve(false), {max: 7, always_resolve: true}),
+    binary_search_async(true/2, i=>Promise.resolve(i>=6), {max: 9, always_resolve: true, exponential: true}),
+    binary_search_async(true/2, i=>Promise.resolve(false), {min:1, max: 2, always_resolve: true, exponential: true}),
+  ]).then(console.log, console.log.bind(null, 'Rejection where we expected a Resolve!'))
+
+  let count = 0
+  binary_search_async(true/2, i=>{++count; return Promise.resolve(6897**3 - 57 * 3**19 <= i)}, {min:0, max:Infinity, always_resolve: true, exponential: true})
+    .then(q=>console.log('result:', {count, q}))
+
+}
+/**/
+
+// return {binary_search_async}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Sync /*extends Promise*/ {
+  constructor(callback) {
+    // super(()=>null)
+    this.status = 'promise'
+    let promiseResolve, promiseReject
+    let promise = new Promise((s, j)=>[promiseResolve, promiseReject] = [s, j])
+    let firstFrame = true
+    let settled = false // pending vs settled (fulfilled or rejected)
+    let resolve = value=>{
+      // console.log('---', value)
+      if (settled) return null
+      settled = true
+      if (firstFrame && !(value instanceof Promise)) {
+        this.value = value
+        this.fulfilled = true
+        this.status = 'fulfilled'
+      } else {
+        // console.log('promiseResolve', promiseResolve)
+        promiseResolve(value)
+      }
+    }
+    let reject = reason=>{
+      if (settled) return null
+      settled = true
+      if (firstFrame && !(reason instanceof Promise)) {
+        this.reason = reason
+        this.fulfilled = false
+        this.status = 'rejected'
+      } else {
+        // console.log('promiseReject', promiseReject)
+        promiseReject(reason)
+      }
+    }
+    try {
+      if (callback instanceof Function) callback(resolve, reject)
+      else if (callback instanceof Sync) 'value,reason,status,fulfilled'.split(',').forEach(s=>this[s] = callback[s])
+    } catch (reason) {
+      reject(reason)
+    }
+    firstFrame = false
+    if (this.status == 'promise') {
+      this.value = promise
+    }
+  }
+  static resolve(value) { return new Sync(resolve=>resolve(value)) }
+  static reject(value) { return new Sync((_, reject)=>reject(value)) }
+  static all(list) {
+    if (list.every(sync=>sync instanceof Sync && sync.fulfilled)) return Sync.resolve(list.map(sync=>sync.value))
+    if (list.every(sync=>sync instanceof Promise || sync.status != 'rejected')) return Promise.all(list)
+    return Sync.reject(list.find(sync=>!sync.fulfilled).reason)
+  }
+  // static any(list) { return list[0].fulfilled && Sync.resolve(list[0].value) || Sync.reject(list[0].reason) }
+  // static race(list) { return Sync.any(list) }
+  // static allSettled(list) { return Sync.resolve(list) }
+  then(s, j) {
+    if (this.status != 'rejected') return Sync.resolve(s(this.value)) // new Sync(resolve=>resolve(s(this.value)))
+    else if (j) return Sync.resolve(j(this.reason)) // new Sync(resolve=>resolve(j(this.reason)))
+    return this
+  }
+  catch(j) { return new Sync(resolve=>resolve(j(this.reason))) }
+  // finally(f) {
+  //   let e = f(this.fulfilled && this.value || this.reason)
+  //   if (!e.fulfilled) return Sync.reject(e.reason)
+  //   return this
+  // }
+}
+
+function sync(callback) {
+  let s = new Sync(callback)
+  if (s.status != 'rejected') return s.value
+  throw s.reason
+}
+
+/* Exporting for Node.js without breaking WebExt */
+if (!globalThis.module) globalThis.module = {}
+module.exports = {Sync, sync}
+
+/*/
+/*/
+/*/
+;(async()=>{
+  // console.log('await Promise resolve reject', await Promise.resolve(Promise.reject(1)))
+  // console.log('await Sync resolve reject', await Sync.resolve(Sync.reject(1)))
+  let s = new Sync((resolve)=>resolve(3))
+  console.log('sync', sync(resolve=>resolve(1)))
+  console.log('sync Sync.resolve', sync(Sync.resolve(2)))
+  console.log('Sync .value', s.value)
+  console.log('static Sync .value', Sync.resolve(5).value)
+  console.log('Sync.all', await Sync.all([s, s]))
+  console.log('Sync.all(Promise)', await Sync.all([s, s, Promise.resolve(8)]))
+  console.log('Promise.all', await Promise.all([s, s]))
+  console.log('await Sync', await Sync.resolve(4))
+  console.log('await SyncSync', await Sync.resolve(Sync.resolve(7)))
+  console.log('await aSync', await Sync.resolve(Promise.resolve(99)))
+})()
+/**/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// https://cp-algorithms.com/data_structures/fenwick.html
+class FenwickTree {
+  constructor(length) {
+    this.length = length
+    // this.bit = Array(length).fill(0)
+    this.bit = new Map()
+  }
+
+  // FenwickTree(vector<int> a) : FenwickTree(a.size()) {
+  //     for (size_t i = 0; i < a.size(); i++)
+  //         add(i, a[i]);
+  // }
+
+  add(idx, delta) {
+    for (; idx < this.length; idx = idx | (idx + 1)) {
+      // this.bit[idx] += delta;
+      let v = (this.bit.get(idx) || 0) + delta
+      if (v != 0) this.bit.set(idx, v)
+      else this.bit.delete(idx)
+    }
+  }
+
+  /*
+    sum(r) == sum(0, r)
+    sum(i, i) == point_query(i)
+  */
+  sum(l, r) {
+    if (r == null) {
+      r = l
+      let ret = 0
+      for (; r >= 0; r = (r & (r + 1)) - 1)
+        ret += (this.bit.get(r) || 0)
+      return ret
+    }
+    return this.sum(r) - this.sum(l - 1)
+  }
+
+  /*
+    Either use (add() and sum()) XOR (range_add() and point_query()), not both.
+    If you want to use it in both ways, use FenwickTreeRangeQuery instead.
+  */
+  range_add(l, r, delta) {
+    this.add(l, delta)
+    this.add(r + 1, -delta)
+  }
+  point_query(idx) {return this.sum(idx)}
+
+}
+
+class FenwickTreeRangeQuery {
+  constructor(length) {
+    this.length = length
+    this.B1 = new FenwickTree(length)
+    this.B2 = new FenwickTree(length)
+  }
+
+  add(i, x) {
+    this.range_add(i, i, x)
+  }
+
+  range_add(l, r, x) {
+    this.B1.add(l, x)
+    this.B1.add(r + 1, -x)
+    this.B2.add(l, x * (l - 1))
+    this.B2.add(r + 1, -x * r)
+  }
+
+  /*
+    sum(r) == sum(0, r)
+    sum(i, i) == point_query(i)
+  */
+  sum(l, r) {
+    if (r == null) {
+      return this.B1.sum(l) * l - this.B2.sum(l)
+    }
+    return this.sum(r) - this.sum(l - 1)
+  }
+
+  point_query(i) {
+    return this.sum(i, i)
+  }
+}
+
+/* Exporting for Node.js without breaking WebExt */
+if (!globalThis.module) globalThis.module = {}
+module.exports = {FenwickTree, FenwickTreeRangeQuery}
+
+/*/
+/*/
+/*/
+
+let ft = new FenwickTree(4)
+let a = []
+// for (let i = 0; i < ft.length; ++i) {
+//   let x = Math.floor(Math.random() * 5)
+//   a[i] = x
+//   ft.add(i, x)
+// }
+for (let i = 0; i < ft.length; ++i) {
+  console.log(ft.sum(i, i), ft.sum(i))
+}
+console.count('---')
+ft.range_add(1, 2, 5)
+for (let i = 0; i < ft.length; ++i) {
+  console.log(ft.sum(i, i), ft.sum(i))
+}
+console.log(...ft.bit.entries())
+
+console.count('---')
+let rq = new FenwickTreeRangeQuery(8)
+rq.range_add(1, 2, 1)
+rq.range_add(4, 6, 1)
+// rq.add(0, 1)
+
+for (let i = 0; i < rq.length; ++i) {
+  console.log(rq.sum(i, i), rq.sum(i))
+}
+console.log(...rq.B1.bit.entries())
+console.log(...rq.B2.bit.entries())
+
+/**/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class IntInterval {
+  constructor(length) {
+    if (typeof length != 'number') {
+      let from = length
+      length = from.length
+      this.length = length
+      this.fenwick = new FenwickTreeRangeQuery(length)
+      for (const interval of from) {
+        this.set(...interval)
+      }
+      return
+    }
+    this.length = length
+    this.fenwick = new FenwickTreeRangeQuery(length)
+  }
+
+  set(l, r) {
+    // console.log('set(', l, r, ')')
+    let c = this.fenwick.sum(l, r)
+    if (c == r - l + 1) return null
+    if (c == 0) return this.fenwick.range_add(l, r, 1)
+    let m = Math.floor((l + r) / 2)
+    this.set(l, m)
+    this.set(m + 1, r)
+  }
+
+  unset(l, r) {
+    if (r >= this.length) r = this.length - 1
+    // console.log('unset(', l, r, ')')
+    let c = this.fenwick.sum(l, r)
+    if (c == 0) return null
+    if (c == r - l + 1) return this.fenwick.range_add(l, r, -1)
+    let m = Math.floor((l + r) / 2)
+    this.unset(l, m)
+    this.unset(m + 1, r)
+  }
+
+  flip(l, r) {
+    c = this.fenwick.sum(l, r)
+    if (c == 0) return this.set(l, r)
+    if (c == r - l + 1) return this.unset(l, r)
+    let m = Math.floor((l + r) / 2)
+    this.flip(l, m)
+    this.flip(m + 1, r)
+  }
+
+  /* like  */
+  setInterval(intervals, v, interval_v_overrides) {
+    if (Array.isArray(intervals) && typeof intervals[0] == 'number') intervals = [intervals]
+    for (const interval of intervals) {
+      let setter = b=>{
+        switch (b) {
+          case 1: this.set(...interval); break
+          case 0: this.unset(...interval); break
+          default: this.flip(...interval)
+        }
+      }
+      let interval_bit = (interval_v_overrides || v == undefined) && interval.length == 3 ? interval[2] : v
+      setter(interval_bit)
+    }
+  }
+
+  get(l, r) {
+    if (r == null) return this.fenwick.point_query(l)
+    return this.fenwick.sum(l, r)
+  }
+
+  iterator(l = 0, r = Infinity, bit = 1){
+    if (r == Infinity) r = this.length - 1
+    let that = this
+    return pairs(generate_recursive(l, r, 1 - bit, 1 - bit))
+
+    function* pairs(g) {
+      let r
+      while (r = [g.next(), g.next()], !r[0].done)
+        yield r.map(q=>q.value)
+    }
+    function* generate_recursive(l, r, lmode = 0, rmode = 0) {
+      let c = that.fenwick.sum(l, r)
+      // console.log(l, r, 'modes:', lmode, rmode, 'c:', c)
+      if ((bit && c == r - l + 1) || (!bit && c == 0)) {
+        if (lmode != bit) yield l
+        if (rmode != bit) yield r
+        return
+      }
+      let m = Math.floor((l + r) / 2)
+      let sl = that.fenwick.sum(l, m)
+      if (bit && sl || !bit && sl < m - l + 1) yield* generate_recursive(l, m, lmode, that.fenwick.point_query(m + 1))
+      let sr = that.fenwick.sum(m + 1, r)
+      if (bit && sr || !bit && sr < r - (m + 1) + 1) yield* generate_recursive(m + 1, r, that.fenwick.point_query(m), rmode)
+    }
+  }
+  [Symbol.iterator]() { return this.iterator() }
+}
+
+function* expand_pairs(g) {
+  let r
+  while (r = g.next(), !r.done)
+    for (let i = r.value[0]; i <= r.value[1]; ++i)
+      yield i
+}
+
+/* Exporting for Node.js without breaking WebExt */
+if (!globalThis.module) globalThis.module = {}
+module.exports = {IntInterval}
+
+/* Importing for Node.js and WebExt without breaking the other */
+let required = require('./FenwickTree.js', {local: '/lib/internal'})
+if (!(required instanceof Promise)) for (const k in required) globalThis[k] = required[k]
+required
+
+/*/
+/*/
+
+if (globalThis.process && globalThis.process.version) {
+  console.log('IntInterval.js')
+  // console.log(globalThis.process.env)
+  let interval = new IntInterval(100)
+  interval.set(2, 9)
+  interval.unset(4, 5)
+  {
+    console.log([...interval])
+  }
+  {
+    let iterator = interval.iterator(1, Infinity, 0)
+    console.log([...iterator])
+  }
+}
+
+/**/
+
+
+
+
+  // gen_index(l = 0, r = Infinity){
+  //   if (r == Infinity) r = this.length - 1
+  //   let that = this
+  //   if (l == r && !that.fenwick.point_query(l)) return (function* empty() {})()
+  //   return generate_recursive(l, r)
+
+
+  //   function* generate_recursive(l, r) {
+  //     // let c = that.fenwick.sum(l, r)
+  //     // // if (c == 0) yield* generate(l, l)
+  //     // if (c == r - l + 1) yield* generate(l, r)
+  //     if (l == r) yield l
+  //     else {
+  //       let m = Math.floor((l + r) / 2)
+  //       if (that.fenwick.sum(l, m)) yield* generate_recursive(l, m)
+  //       if (that.fenwick.sum(l + 1, r)) yield* generate_recursive(m + 1, r)
+  //     }
+  //   }
+  // }

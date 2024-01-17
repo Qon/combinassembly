@@ -1,0 +1,8 @@
+*a = 0
+*b = 1
+
+loop:
+	*c = *a + *b
+	*a = *b
+	*b = *c
+goto loop

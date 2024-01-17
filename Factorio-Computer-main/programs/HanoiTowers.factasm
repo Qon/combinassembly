@@ -1,0 +1,144 @@
+const resBase = g
+const res = h
+const stack = o
+
+*stack = 96
+*resBase = 32
+*res = *resBase
+
+
+# Outer call
+**stack = 5 # Number of disks
+*stack = *stack + 1
+**stack = 1
+*stack = *stack + 1
+**stack = 2
+*stack = *stack + 1
+**stack = 3
+*stack = *stack + 1
+**stack = hanoiComplete
+*stack = *stack + 1
+
+
+# ----- Hanoi function -----
+
+const levelAddress = a
+const fromAddress = b
+const tempAddress = c
+const toAddress = d
+const returnAddress = e
+
+const recStride = 5
+const levelShift = 5
+const fromShift = 4
+const tempShift = 3
+const toShift = 2
+const retShift = 1
+hanoi:
+	*levelAddress = *stack - levelShift
+	if **levelAddress > 0 goto processLevel
+		*returnAddress = *stack - retShift
+		goto **returnAddress
+	processLevel:
+
+	*fromAddress = *stack - fromShift
+	*tempAddress = *stack - tempShift
+	*toAddress = *stack - toShift
+
+	**stack = **levelAddress - 1
+	*stack = *stack + 1
+	**stack = **fromAddress
+	*stack = *stack + 1
+	**stack = **toAddress
+	*stack = *stack + 1
+	**stack = **tempAddress
+	*stack = *stack + 1
+	**stack = pushThisLevel
+	*stack = *stack + 1
+	goto hanoi
+
+	pushThisLevel:
+	*stack = *stack - recStride
+
+	*returnAddress = *stack - retShift
+	*levelAddress = *stack - levelShift
+	*fromAddress = *stack - fromShift
+	*tempAddress = *stack - tempShift
+	*toAddress = *stack - toShift
+
+	**res = **fromAddress
+	*res = *res + 1
+	**res = **toAddress
+	*res = *res + 1
+
+	**stack = **levelAddress - 1
+	*stack = *stack + 1
+	**stack = **tempAddress
+	*stack = *stack + 1
+	**stack = **fromAddress
+	*stack = *stack + 1
+	**stack = **toAddress
+	*stack = *stack + 1
+	**stack = finishHanoi
+	*stack = *stack + 1
+	goto hanoi
+
+	finishHanoi:
+	*stack = *stack - recStride
+
+	*returnAddress = *stack - retShift
+	goto **returnAddress
+
+hanoiComplete:
+*stack = *stack - recStride
+# ^ Strictly speaking unnecessary, because stack is not used afterwards
+
+
+
+# ----- Check -----
+# (mostly copied from BubbleSort.factasm)
+const correctLenReg = e
+*correctLenReg = correctLen
+
+
+# Check res length
+const resLenReg = b
+*resLenReg = *res - *resBase
+if *resLenReg != *correctLenReg goto bad
+
+
+# Check res elements
+const correctArrayReg = f
+*correctArrayReg = correctArray
+
+# Re-use registers
+const output = c
+const expected = d
+
+check:
+*i = 0 - 1
+
+checkLoop:
+	*i = *i + 1
+	if *i >= *correctLenReg goto good
+
+	*output = *resBase + *i
+	*expected = *correctArrayReg + *i
+	if **output = **expected goto checkLoop
+
+# Bad
+bad:
+*a = 0 - 13
+halt
+
+good:
+*a = 1000
+halt
+
+
+
+# 4 disks
+# correctArray: len(correctLen)[1, 2, 1, 3, 2, 3, 1, 2, 3, 1, 3, 2, 1, 2, 1, 3, 2, 3, 2, 1, 3, 1, 2, 3, 1, 2, 1, 3, 2, 3]
+
+# 5 disks
+correctArray: len(correctLen)[1, 3, 1, 2, 3, 2, 1, 3, 2, 1, 2, 3, 1, 3, 1, 2, 3, 2, 3, 1, 2, 1, 3, 2, 1, 3, 1, 2, 3, 2, 1, 3, 2, 1, 2, 3, 1, 3, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 3, 1, 2, 3, 2, 1, 3, 2, 1, 2, 3, 1, 3]

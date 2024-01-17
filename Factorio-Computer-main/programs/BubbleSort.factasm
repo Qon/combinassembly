@@ -1,0 +1,89 @@
+# ABCDEFghijklMNOP
+
+
+const initialArrayReg = a
+const arrayReg = b
+const lenReg = c
+const correctArrayReg = k
+
+*initialArrayReg = initialArray
+*correctArrayReg = correctArray
+*arrayReg = 32 # Some address in RAM
+*lenReg = arrayLen
+
+
+# Copy array from ROM to RAM
+
+const fromBase = initialArrayReg
+const toBase = arrayReg
+
+const from = d
+const to = e
+
+*i = 0
+copyLoop:
+if *i >= *lenReg goto sort
+	*from = *fromBase + *i
+	*to = *toBase + *i
+	**to = **from
+	*i = *i + 1
+goto copyLoop
+
+
+# Sort array in RAM
+
+sort:
+*i = arrayLen
+const temp = f
+const left = g
+const right = h
+
+outerLoop:
+*i = *i - 1
+if *i < 1 goto check
+	*j = 0
+
+	innerLoop:
+	*j = *j + 1
+	if *j > *i goto outerLoop
+		*right = *arrayReg + *j
+		*left = *right - 1
+		if **left <= **right goto innerLoop
+			*temp = **left
+			**left = **right
+			**right = *temp
+	goto innerLoop
+
+
+
+# ----- Check -----
+
+# Re-use registers
+const output = left
+const expected = right
+
+check:
+*i = 0 - 1
+
+checkLoop:
+	*i = *i + 1
+	if *i >= *lenReg goto good
+
+	*output = *arrayReg + *i
+	*expected = *correctArrayReg + *i
+	if **output = **expected goto checkLoop
+
+# Bad
+*a = 0 - 13
+halt
+
+good:
+*a = 1000
+halt
+
+
+# initialArray: len(arrayLen)[1, 100200300, 20, 300400, 300, 5005, 4444, 77, 9800500]
+# correctArray: [1, 20, 77, 300, 4444, 5005, 300400, 9800500, 100200300]
+
+initialArray: len(arrayLen)[7782, 801, 833, 2997, 1061, 3158, 8123, 4491, 8948, 324, 5058, 9279, 8552, 5928, 968, 7333, 8829, 1712, 2417, 3711]
+correctArray: [324, 801, 833, 968, 1061, 1712, 2417, 2997, 3158, 3711, 4491, 5058, 5928, 7333, 7782, 8123, 8552, 8829, 8948, 9279]
