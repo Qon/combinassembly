@@ -313,12 +313,16 @@ function* combinatorial(...alts) {
 //     process.exitCode = 1;
 //   });
 
+// function inspect(s) {
+//   return Deno.inspect(s, {
+//       showHidden: false,
+//       depth: null,
+//       maxArrayLength: null
+//   })
+// }
+
 function inspect(s) {
-  return Deno.inspect(s, {
-      showHidden: false,
-      depth: null,
-      maxArrayLength: null
-  })
+  return JSON.stringify(s, null, 2)
 }
 
 // let fs = require('fs')
@@ -716,7 +720,8 @@ function inout_params(operation) {
 
 function mapify_signals(signals_node, context) {
   let m = new Map()
-  if (signals_node.node != 'signals') throw new Error(`Can't make a signals map of something that isn't a signals node`)
+  if (signals_node == 0) return m
+  if (signals_node.node != 'signals') throw new Error(`Can't make a signals map of something that isn't a signals node, signals_node: ${signals_node}`)
   for (let signal of signals_node.signals) {
     m.set(signal.name.string, resolve_expression(signal.value, context))
   }
@@ -1145,7 +1150,7 @@ function _resolve_expression(expr, context) {
     for (let i = 0; i < expr.length; ++i) {
       let op = expr[i].token
       let current = prio_of.get(op)
-      let top = prio_of.get(expr[top_prio_index])
+      let top = prio_of.get(expr[top_prio_index]?.token)
       // '^' is the only right associative op and it's top priority (of the 2 param ops), so we can just check if op == '^' first
       if (prio_of.has(op) && (top_prio_index === undefined || current > top)) {
         top_prio_index = i
@@ -2021,6 +2026,7 @@ function make_entity_composition(assembled) {
   let IP_LINES_HEIGHT = 1
   let CODE_LINE_HAS_LAMP = !context.defines.has('lamps') || (resolve_expression(context.defines.get('lamps'), context) & 1)
   let IP_LINES_WIDTH = registers_count > 9 ? 3 - !CODE_LINE_HAS_LAMP : (4 + CODE_LINE_HAS_LAMP)
+  if (registers_count == 0) IP_LINES_WIDTH += 2
   let line_ip = generate_ip(config)
   let arr_line_ip
   for (let i = 0; i < 2; ++i) {
