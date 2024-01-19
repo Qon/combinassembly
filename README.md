@@ -23,15 +23,45 @@ Instruction pointer is in a special register, which is interacted with slightly 
 
 ## Instructions:
 
-### `const`
+### Instruction `const` and signal syntax
 
+The following code lines defines some constant combinators for outputting some signals, one configured constant combinator per line starting with `const`:
+
+```python
+    const   [A] 5   # a constant combinator sending out a signal [A] of value 5.
+    # [A] is automatically converted to the full Factorio rich text tag [virtual-signal=signal-A]
+    const   [iron-plate] 3  # A constant combinator sending out [item=iron-plate].
+    const   [fluid=water] 300   # For fluids we write out the full name including category
+    const   [A] 5   [iron-plate] 3  [fluid=water] 300   # One constant combinator with several signals.
+    # You can have up to 19 signals specified in one constant combinator with instruction `const` (not 20).
+	const	[A] 5, [out]    # arguments are separated by `,`. The second parameter of `const` defines where its output is wired to.
+```
+
+All the vanilla virtual signals have shorthands like `[A]` (case sensitive):
+Special: `[everything]`, `[anything]`, `[each]`
+Letters and numbers: `[0]` to `[9]`, `[A]` to `[Z]`
+Colors: `[red]`, `[green]`, `[blue]`, `[yellow]`, `[pink]`, `[cyan]`, `[white]`, `[grey]`, `[black]`
+Extra: `[check]`, `[info]`, `[dot]`
+
+If there is no category specification ("item=", "fluid=", "virtual-signal=") and it's not one of the listed vanilla virtual signals then the item category is assumed. For items with "=" in their internal name you have to write the full internal name including category. If you write just [water] then the signal in the blueprint will be [item=water], which would only be correct if you play with mods that replaces the fluid `water` with an item named `water`. The assembler doesn't know about any of the Factorio prototypes, which means that it works equally well with modded Factorio items as vanilla. The signals are just strings inserted into the generated blueprint specification and `[` and `]` is just the syntax for string literals in Combinassembly.
+
+The strings (like `[out]`) in the 2nd parameter of `const` is just treated as string literal "out" and will not be in the assembled blueprint, instead it just affects how the wires are connected, in this case to a wire bus called "out".
+
+```python
 	const	[A] 1 [B] 2 [C] -3 [D] 0b100 [E] (1 + 0xA / 3) * 2 - 3, [out]
+```
+creates a constant combinator with the signals `[A]` to `[F]` with values 1 to 5 (except C is negative). Integers only. All explicit calculation expressions written in Combinassembly are folded to resulting values when the program is assembled. Regular operator precedence is used (JS) with the operators `~ + - * / % | & ^` using the same meaning as in JS, except `/` gives integer results. `0x`, `0o` and `0b` for hexadecimal, octal and binary numbers.
 
-creates a constant combinator with the signals [A] to [F] with values 1 to 5 (except C is negative). Integers only. All explicit calculation expressions written in Combinassembly are folded to resulting values when the program is assembled. Regular operator precedence is used (JS) with the operators `~ + - * / % | & ^` using the same meaning as in JS, except `/` gives integer results. `0x`, `0o` and `0b` for hexadecimal, octal and binary numbers. The second argument `[out]` specifies that the output is just wired to the circuit output wire.
+The expression for the 1st argument to `const` can be thought of and used similarly to:
 
-If you try assembling the `const` program above you will notice some other combinators as well as a [black] signal used for making sure the signals are only output when the instruction pointer points to the address of that instruction.
+```JavaScript
+let expr1 = ({["A"]: 1, ["B"]: 2, ["C"]: -3, ["E"]: 0b100, ["E"]: (1 + 0xA / 3) * 2 - 3})
+let expr2 = {A: 1, B: 2, C: -3, D: 4, E: 5} // equivalent JS object again
+```
 
-### `arith` and `decid`
+If you try assembling the `const` programs above you will notice some other combinators as well as a `[black]` signal used for making sure the signals are only output when the instruction pointer points to the address of that instruction.
+
+### Instructions `arith` and `decid`
 
 	arith	[A], [+],  3, [C]
 
@@ -48,9 +78,11 @@ decid	[A], [>], [B], [C] 1, [V] 5 [W] 6, [in], [out], [Z] 7
 
 The `arith` and `decid` combinators should also be configured with wiring, here `[in]` and `[out]` are used. You can skip writing arguments you don't need for these combinators, here the 5th and 8th argument for `arith` was skipped. The 5th argument adds signals to the constant combinator after which otherwise just holds the `[black]` address. The 8th arguments specifies the extra signals on the constant combinator on the input side, which only exists if there are signals defined for it.
 
+The 4th argument (output signal selector) for `decid` is `[C] 1`, setting a value for output signal to 1 means that the "output 1" mode for the decider combinator will be chosen, if it is 0 or undefined the "input value" mode is selected.
+
 The 2nd argument is used to configure the operation of the arithmetic/decider combinator, same string as written in the combinator configuration GUI in Factorio. Instead of `[≥]`, `[≠]` and `[≤]` you can use `[>=]`, `[!=]` and `[<=]` for your keyboard convinience.
 
-### `nop` and `cnop`
+### Pseudo-instructions `nop` and `cnop`
 
 `nop` is a "No OPeration" operation that does nothing but change addresses of following instructions. `nop 1` is the default delay, but other values are possible. `nop 2` is the same as writing two `nop` instruction in a row. Negative delays are semi-supported but is an easy way to mess up for non-experts. In `nop X`, X is an expression without label references.
 
@@ -116,10 +148,6 @@ Used to define Read Only Memory. Will be placed in RAM memory space and read fro
 ```
 
 Lines starting with `:` followed by just an identifier define a label (to a value set by the assembler) which can be used like any constant, except not inside expressions of other directives. Here the output of the `const` instruction is to the `[jump]`  register which hold the instruction pointer. The `[J]` value will be a relative jump backwards this many steps! For forward jumps use negative values! `ip` will be resolved to the address of the instruction it is currently used in, after macro expansion and `.define` expansion. `jump` will set the intruction pointer to the label value. It calculates the relative jump necessary to do the static jump by "subtracting" the current `ip` and "adding" the target label address, with adjustment of "2" to compensate for the duration of the jump macro (const + nop).
-
-`[` and `]` are used for string literals. `[here is a string]`
-After each string an expression for a value can be used.
-
 
 # Credits
 
