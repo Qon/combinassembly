@@ -1,10 +1,10 @@
 # Combinassembly
 
+[Try it live!](https://qon.github.io/combinassembly/) and press the "Assemble!" button execute the assembler to get the blueprint string that runs the Combinassembly code when built in Factorio. The constant combinator with a [dot] signal in the lop left corner will restart the program when toggled on or off.
+
 ______
 
 ### An "assembly" language for Factorio combinators
-
-[Try it live!](https://qon.github.io/combinassembly/)
 
 Write simple "assembly" code, get a blueprint for a combinator network that can execute the code in Factorio!
 Combinassembly is not a general purpose HDL for generating arbitrary combinator networks, instead operations execute sequentially(ish). The assembler does not generate a binary for a CPU, each instruction is a combinator (or several) which computes the operation directly.
@@ -155,6 +155,3 @@ These are available under their own license:
 - Code in directory Factorio-Computer-main from https://github.com/nns2009/Factorio-Computer with some slight modifications by me. Another cool assembly language. factasm_to_combinassembly.js compiles factasm to combinassembly when executed in Deno, with parsing of Factasm done by his Factasm parser.
 - Ace editor from https://ace.c9.io/
 - Pako to compress data, needed for blueprint string functionality
-=======
-- Code in directory Factorio-Computer-main from https://github.com/nns2009/Factorio-Computer with some slight modifications by me. Another cool assembly language.
-- Ace from https://ace.c9.io/
