@@ -13,9 +13,6 @@ Combinassembly has registers and memory which it writes to and reads from. Inste
 
 Instruction pointer is in a special register, which is interacted with slightly differently but can be used to make jumps and conditional branching.
 
-### Credits
-
-<<<<<<< HEAD
 ## Comments
 
     # this is a comment
@@ -29,13 +26,13 @@ Instruction pointer is in a special register, which is interacted with slightly 
 The following code lines defines some constant combinators for outputting some signals, one configured constant combinator per line starting with `const`:
 
 ```python
-	const   [A] 5   # a constant combinator sending out a signal [A] of value 5.
-	# [A] is automatically converted to the full Factorio rich text tag [virtual-signal=signal-A]
-	const   [iron-plate] 3  # A constant combinator sending out [item=iron-plate].
-	const   [fluid=water] 300   # For fluids we write out the full name including category
-	const   [A] 5   [iron-plate] 3  [fluid=water] 300   # One constant combinator with several signals.
-	# You can have up to 19 signals specified in one constant combinator with instruction `const` (not 20).
-	const	[A] 5, [out]    # arguments are separated by `,`. The second parameter of `const` defines where its output is wired to.
+    const   [A] 5   # a constant combinator sending out a signal [A] of value 5.
+    # [A] is automatically converted to the full Factorio rich text tag [virtual-signal=signal-A]
+    const   [iron-plate] 3  # A constant combinator sending out [item=iron-plate].
+    const   [fluid=water] 300   # For fluids we write out the full name including category
+    const   [A] 5   [iron-plate] 3  [fluid=water] 300   # One constant combinator with several signals.
+    # You can have up to 19 signals specified in one constant combinator with instruction `const` (not 20).
+    const   [A] 5, [out]    # arguments are separated by `,`. The second parameter of `const` defines where its output is wired to.
 ```
 
 All the vanilla virtual signals have shorthands like `[A]` (case sensitive):
@@ -49,7 +46,7 @@ If there is no category specification ("item=", "fluid=", "virtual-signal=") and
 The strings (like `[out]`) in the 2nd parameter of `const` is just treated as string literal "out" and will not be in the assembled blueprint, instead it just affects how the wires are connected, in this case to a wire bus called "out".
 
 ```python
-	const	[A] 1 [B] 2 [C] -3 [D] 0b100 [E] (1 + 0xA / 3) * 2 - 3, [out]
+    const   [A] 1 [B] 2 [C] -3 [D] 0b100 [E] (1 + 0xA / 3) * 2 - 3, [out]
 ```
 creates a constant combinator with the signals `[A]` to `[F]` with values 1 to 5 (except C is negative). Integers only. All explicit calculation expressions written in Combinassembly are folded to resulting values when the program is assembled. Regular operator precedence is used (JS) with the operators `~ + - * / % | & ^` using the same meaning as in JS, except `/` gives integer results. `0x`, `0o` and `0b` for hexadecimal, octal and binary numbers.
 
@@ -64,17 +61,17 @@ If you try assembling the `const` programs above you will notice some other comb
 
 ### Instructions `arith` and `decid`
 
-	arith	[A], [+],  3, [C]
+    arith   [A], [+],  3, [C]
 
 creates an arithmetic combinator which is configured just like you would expect, with each argument being defined in same order as in Factorio GUI.
 
-	decid	[A], [=], [B], [C]
+    decid   [A], [=], [B], [C]
 
 `decid` is similarly the keyword for decider combinators. You can use integer constants instead of signals and `[each]`, `[anything]` and `[everything]` just like when configuring combinators in game, with the same rules.
 
-```
-arith	[A], [*], [B], [C]  ,            , [in], [out]
-decid	[A], [>], [B], [C] 1, [V] 5 [W] 6, [in], [out], [Z] 7
+```python
+    arith   [A], [*], [B], [C]  ,            , [in], [out]
+    decid   [A], [>], [B], [C] 1, [V] 5 [W] 6, [in], [out], [Z] 7
 ```
 
 The `arith` and `decid` combinators should also be configured with wiring, here `[in]` and `[out]` are used. You can skip writing arguments you don't need for these combinators, here the 5th and 8th argument for `arith` was skipped. The 5th argument adds signals to the constant combinator after which otherwise just holds the `[black]` address. The 8th arguments specifies the extra signals on the constant combinator on the input side, which only exists if there are signals defined for it.
@@ -97,13 +94,13 @@ The macro system gives a powerful way to extend the language with new combinatio
 
 ```python
 :loop
-    jump    loop	# will be expanded to the contents of the macro `jump`, with the argument `loop` as value for parameter `label`
+    jump    loop    # will be expanded to the contents of the macro `jump`, with the argument `loop` as value for parameter `label`
 
 # Define macro `jump`
-%jump     label	# parameter list with `,` separated identifiers that you can use inside the macro
-  const   [J] ip + 2 - label, [jump]
-  nop
-%	# end of macro definition
+%jump     label # parameter list with `,` separated identifiers that you can use inside the macro
+    const   [J] ip + 2 - label, [jump]
+    nop
+%   # end of macro definition
 ```
 
 ## Directives
@@ -111,8 +108,8 @@ The macro system gives a powerful way to extend the language with new combinatio
 ### Directive `.define`
 
 ```python
-.define some_signals	[A] 0xFF [red] an_integer [iron-plate] 3 [fluid=water] 10
-.define an_integer	5
+.define some_signals    [A] 0xFF [red] an_integer [iron-plate] 3 [fluid=water] 10
+.define an_integer  5
 ```
 
 There are a few assembler directives. Directives start on a line with `.` followed by a keyword indentifying the specific directive. `.define` is used to bind a (constant) expression to a name. After the `.define` follows the identifier and then the expression, which may include other defined constants. `.define`'s are hoisted, their order doesn't matter and the defined constants may be used in any expression (and in expressions of other `.define` lines as well) before or after as long as there is no recursion (self or mutual).
@@ -144,8 +141,8 @@ Used to define Read Only Memory. Will be placed in RAM memory space and read fro
     jump    loop
 
 %jump     label
-  const   [J] ip + 2 - label, [jump]
-  nop
+    const   [J] ip + 2 - label, [jump]
+    nop
 %
 ```
 
@@ -161,4 +158,3 @@ These are available under their own license:
 =======
 - Code in directory Factorio-Computer-main from https://github.com/nns2009/Factorio-Computer with some slight modifications by me. Another cool assembly language.
 - Ace from https://ace.c9.io/
->>>>>>> parent of 39f7eab (extended README)
