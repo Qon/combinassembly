@@ -172,10 +172,12 @@
     <div id="tab-bp-string-content" class="tab-content"></div>
 
     <script src="ace-src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="pako.js" type="text/javascript" charset="utf-8"></script>
-    <script src="combinassembly.js" type="text/javascript"></script>
-    <script src="default_combinassembly.js" type="text/javascript"></script>
-    <script>
+    <!-- <script src="pako.js" type="text/javascript" charset="utf-8"></script> -->
+    <!-- <script src="combinassembly.js" type="text/javascript"></script> -->
+    <!-- <script src="default_combinassembly.js" type="text/javascript"></script> -->
+    <script type="module">
+        import {run_assembler} from './combinassembly.js'
+        import {default_combinassembly} from './default_combinassembly.js'
         let i = 0
         let editors = new Map()
         for (let editor_el of document.querySelectorAll('.editor')) {

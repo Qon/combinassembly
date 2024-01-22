@@ -20,7 +20,7 @@ let default_combinassembly = `# this is a comment, starts with the '#' and ends 
                   # But just using ic registers and combining the two in t is pretty easy so I went with that
 
   mov     n, b                      # b = n      (I like putting return value in register [ic] 0)
-  branch  end, [V], [<=], 1, n       # if (n <= 1) return b
+  branch  end, [V], [<=], 1, n      # if (n <= 1) return b
 
   set     [I] 2, i                  # i = 2      (We didn't jump to return so our loop variable can start here)
   set     [V] 1, a                  # a = 1
@@ -203,3 +203,5 @@ let default_combinassembly = `# this is a comment, starts with the '#' and ends 
   nop
   add     [memr], [memw], [red] destination_address
 %`
+
+export {default_combinassembly}

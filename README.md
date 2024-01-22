@@ -1,20 +1,21 @@
 # Combinassembly
 
-[Try it live!](https://qon.github.io/combinassembly/) and press the "Assemble!" button execute the assembler to get the blueprint string that runs the Combinassembly code when built in Factorio. The constant combinator with a [dot] signal in the lop left corner will restart the program when toggled on or off.
-
 ______
 
-# An "assembly" language for Factorio combinators
+### An "assembly" language for Factorio combinators
 
-Write simple assembly code, get a blueprint for a combinator network that can execute the code in Factorio!
+[Try it live!](https://qon.github.io/combinassembly/)
+
+Write simple "assembly" code, get a blueprint for a combinator network that can execute the code in Factorio!
 Combinassembly is not a general purpose HDL for generating arbitrary combinator networks, instead operations execute sequentially(ish). The assembler does not generate a binary for a CPU, each instruction is a combinator (or several) which computes the operation directly.
 
 Combinassembly has registers and memory which it writes to and reads from. Instead of wiring combinators to eachother directly, everything goes through memory/register instead. How much memory and how many registers available is configured with assembly directives in your combinassembly source code.
 
 Instruction pointer is in a special register, which is interacted with slightly differently but can be used to make jumps and conditional branching.
 
-# Quick intro
+### Credits
 
+<<<<<<< HEAD
 ## Comments
 
     # this is a comment
@@ -28,12 +29,12 @@ Instruction pointer is in a special register, which is interacted with slightly 
 The following code lines defines some constant combinators for outputting some signals, one configured constant combinator per line starting with `const`:
 
 ```python
-    const   [A] 5   # a constant combinator sending out a signal [A] of value 5.
-    # [A] is automatically converted to the full Factorio rich text tag [virtual-signal=signal-A]
-    const   [iron-plate] 3  # A constant combinator sending out [item=iron-plate].
-    const   [fluid=water] 300   # For fluids we write out the full name including category
-    const   [A] 5   [iron-plate] 3  [fluid=water] 300   # One constant combinator with several signals.
-    # You can have up to 19 signals specified in one constant combinator with instruction `const` (not 20).
+	const   [A] 5   # a constant combinator sending out a signal [A] of value 5.
+	# [A] is automatically converted to the full Factorio rich text tag [virtual-signal=signal-A]
+	const   [iron-plate] 3  # A constant combinator sending out [item=iron-plate].
+	const   [fluid=water] 300   # For fluids we write out the full name including category
+	const   [A] 5   [iron-plate] 3  [fluid=water] 300   # One constant combinator with several signals.
+	# You can have up to 19 signals specified in one constant combinator with instruction `const` (not 20).
 	const	[A] 5, [out]    # arguments are separated by `,`. The second parameter of `const` defines where its output is wired to.
 ```
 
@@ -52,7 +53,7 @@ The strings (like `[out]`) in the 2nd parameter of `const` is just treated as st
 ```
 creates a constant combinator with the signals `[A]` to `[F]` with values 1 to 5 (except C is negative). Integers only. All explicit calculation expressions written in Combinassembly are folded to resulting values when the program is assembled. Regular operator precedence is used (JS) with the operators `~ + - * / % | & ^` using the same meaning as in JS, except `/` gives integer results. `0x`, `0o` and `0b` for hexadecimal, octal and binary numbers.
 
-The expression for the 1st argument to `const` can be thought of and used similarly to:
+The expression for the 1st argument to `const` can be thought of and used similarly to JavaScript objects:
 
 ```JavaScript
 let expr1 = ({["A"]: 1, ["B"]: 2, ["C"]: -3, ["E"]: 0b100, ["E"]: (1 + 0xA / 3) * 2 - 3})
@@ -96,12 +97,13 @@ The macro system gives a powerful way to extend the language with new combinatio
 
 ```python
 :loop
-    jump    loop
+    jump    loop	# will be expanded to the contents of the macro `jump`, with the argument `loop` as value for parameter `label`
 
-%jump     label
+# Define macro `jump`
+%jump     label	# parameter list with `,` separated identifiers that you can use inside the macro
   const   [J] ip + 2 - label, [jump]
   nop
-%
+%	# end of macro definition
 ```
 
 ## Directives
@@ -110,7 +112,7 @@ The macro system gives a powerful way to extend the language with new combinatio
 
 ```python
 .define some_signals	[A] 0xFF [red] an_integer [iron-plate] 3 [fluid=water] 10
-.define an_integer		5
+.define an_integer	5
 ```
 
 There are a few assembler directives. Directives start on a line with `.` followed by a keyword indentifying the specific directive. `.define` is used to bind a (constant) expression to a name. After the `.define` follows the identifier and then the expression, which may include other defined constants. `.define`'s are hoisted, their order doesn't matter and the defined constants may be used in any expression (and in expressions of other `.define` lines as well) before or after as long as there is no recursion (self or mutual).
@@ -156,3 +158,7 @@ These are available under their own license:
 - Code in directory Factorio-Computer-main from https://github.com/nns2009/Factorio-Computer with some slight modifications by me. Another cool assembly language. factasm_to_combinassembly.js compiles factasm to combinassembly when executed in Deno, with parsing of Factasm done by his Factasm parser.
 - Ace editor from https://ace.c9.io/
 - Pako to compress data, needed for blueprint string functionality
+=======
+- Code in directory Factorio-Computer-main from https://github.com/nns2009/Factorio-Computer with some slight modifications by me. Another cool assembly language.
+- Ace from https://ace.c9.io/
+>>>>>>> parent of 39f7eab (extended README)
