@@ -1949,12 +1949,12 @@ function make_entity_composition(assembled) {
     electric_wire(substations[i][1], substations[i + 1][1])
   }
 
-  if (lines.length) {
-    connect(J_BUS_COLOR, lines[0].out_jump, line_ip.cell)
+  if (lines.length)
     connect(IP_BUS_COLOR, line_ip.cell, lines[0].gate)
-  }
+  if (bus_past_registers.length)
+    connect(J_BUS_COLOR, bus_past_registers.slice(-1)[0].out_jump, line_ip.cell)
 
-  if (lines.length && mem_lines.length) {
+  if (mem_lines.length) {
     connect(W_BUS_COLOR, bus_past_registers[0].memqw, mem_lines.slice(-1)[0].write_gate)
     connect(Q_BUS_COLOR, bus_past_registers[0].memqw, mem_lines.slice(-1)[0].query_gate)
     connect(R_BUS_COLOR, bus_past_registers[0].input, mem_lines.slice(-1)[0].query_gate, 1, 2)

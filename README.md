@@ -150,6 +150,15 @@ Used to define Read Only Memory. Will be placed in RAM memory space and read fro
 
 Lines starting with `:` followed by just an identifier define a label (to a value set by the assembler) which can be used like any constant, except not inside expressions of other directives. Here the output of the `const` instruction is to the `[jump]`  register which hold the instruction pointer. The `[J]` value will be a relative jump backwards this many steps! For forward jumps use negative values! `ip` will be resolved to the address of the instruction it is currently used in, after macro expansion and `.define` expansion. `jump` will set the intruction pointer to the label value. It calculates the relative jump necessary to do the static jump by "subtracting" the current `ip` and "adding" the target label address, with adjustment of "2" to compensate for the duration of the jump macro (const + nop).
 
+# TODO
+
+- More guides, example codes, language documentation
+- Improved error handling and reporting.
+- 2D layout (multiple columns) so that you can actually find a space where the program fits large programs.
+- Memory mapped IO language support
+- Entity JSON description for extensibility (any entity wired into the program, even from mods). Will also require support for differently sized entities. Possibility of removing operations `arith` and `decid` from language and supply them as "standard library" macros instead?
+- 1 tick jump possible?
+
 # Credits
 
 These are available under their own license:
