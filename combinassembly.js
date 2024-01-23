@@ -1530,7 +1530,7 @@ let get_point_from_multi_connect_bus = (map, regbus, input_colored_count, memr_c
   return regbus[bus_idx]
 }
 
-function generate_line(operation, compute_combinators, {regbus, input_colored_count, memr_colored_count}, config, context) {
+function generate_line(operation, compute_combinators, {regbus, input_colored_count, memr_colored_count}, mem_size, config, context) {
   // console.log('generate_line()', inspect({operation}))
   if (operation.operator.string == NOP) return NOP
 
@@ -1548,7 +1548,7 @@ function generate_line(operation, compute_combinators, {regbus, input_colored_co
     memqw: 'constant-combinator',
     out_jump: 'constant-combinator',
   }
-  if (!context.globals_address.size) {
+  if (!mem_size /*context.globals_address.size*/) {
     delete line.input
     delete line.memqw
   }
@@ -1901,7 +1901,7 @@ function make_entity_composition(assembled) {
   // line = null  // continuous bus
   for (let i = 0; i < operations.length; ++i) {
     if (operations[i].operator.string == VOID) continue;
-    let candidate = generate_line(operations[i], compute_combinators, {regbus, input_colored_count, memr_colored_count}, config, context)
+    let candidate = generate_line(operations[i], compute_combinators, {regbus, input_colored_count, memr_colored_count}, mem_size, config, context)
     if (candidate == NOP) continue;
     x = 0
     let prev_line = line
