@@ -229,7 +229,11 @@
             document.querySelector('#tab-blueprint-content textarea').value = ''
             document.querySelector('#tab-bp-string').classList.add('hidden')
             document.querySelector('#tab-bp-string-content').textContent = ''
-            let assembled = run_assembler(editors.get(document.querySelector('#tab-source-content .editor')).getValue())
+            let source = editors.get(document.querySelector('#tab-source-content .editor')).getValue()
+            try {
+                window.localStorage.combinassembly_source = source
+            } catch (e) {}
+            let assembled = run_assembler(source)
             // document.querySelector('#tab-bp-string-content textarea').value
 
             if (assembled.error) {
@@ -267,9 +271,12 @@
             }
         })
         select_tab(document.querySelector('#tab-source'))
-        console.log(editors)
-        console.log(editors.get(document.querySelector('#tab-source .editor')))
-        editors.get(document.querySelector('#tab-source-content .editor')).setValue(default_combinassembly, -1)
+        let saved_source
+        try {
+            saved_source = window.localStorage.combinassembly_source
+        } catch (e) {}
+        let source = saved_source || default_combinassembly
+        editors.get(document.querySelector('#tab-source-content .editor')).setValue(source, -1)
     </script>
 </body>
 </html>

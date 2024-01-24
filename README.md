@@ -2,6 +2,8 @@
 
 [Try it live!](https://qon.github.io/combinassembly/) and press the "Assemble!" button execute the assembler to get the blueprint string that runs the Combinassembly code when built in Factorio. The constant combinator with a [dot] signal in the lop left corner will restart the program when toggled on or off.
 
+(Code is saved in browser when you press "Assemble!", but it is reset to the default on load if the saved source is a completely empty string.)
+
 ______
 
 ## An "assembly" language for Factorio combinators
@@ -116,6 +118,10 @@ The macro system gives a powerful way to extend the language with new combinatio
 
 There are a few assembler directives. Directives start on a line with `.` followed by a keyword indentifying the specific directive. `.define` is used to bind a (constant) expression to a name. After the `.define` follows the identifier and then the expression, which may include other defined constants. `.define`'s are hoisted, their order doesn't matter and the defined constants may be used in any expression (and in expressions of other `.define` lines as well) before or after as long as there is no recursion (self or mutual).
 
+#### Registers
+
+Some `.define`'s have a special meaning. `ic` and `mc` when defined creates that many `ic` and `mc` registers (up to 20 ic + mc supported). The registers are read with wire connection `[ic] 0` to `[ic] ic - 1`, and similarly for `[mc]` registers.
+
 ### Directive `.global`
 
 The other directive is `.global` which is used to create RAM. It also defines constants which can be used similarly to `.define`d constants, but the lines
@@ -154,9 +160,10 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
 
 - More guides, example programs, language documentation
 - Editor and assembler improvements:
-    - Web editor should remember code on reload
+    - [v] ~~Web editor should remember code on reload~~
     - Improved error handling and reporting.
     - 2D layout (multiple columns) so that you can actually find a space where the program fits large programs.
+    - Fix cli to accept stdin and file parameter
 - New language features
     - Memory mapped IO language support
     - Language features for connecting multiple parallel execution units (with their own instruction pointers) that can communicate with eachother through memory.
@@ -164,6 +171,20 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
         - Possibility of removing operations `arith` and `decid` from language and supply them as "standard library" macros instead?
         - Will need blueprint string decoder added to interface
     - 1 tick jump possible?
+
+# Executing
+
+If python3 is installed then run something like:
+
+    python3 -m http.server
+
+or use another [simple file server of your choice](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/set_up_a_local_testing_server) from project directory and navigate to <localhost:8000>
+
+Or
+
+    deno run cli.js
+
+cli.js currently only assembles the source from a local variable for now, so you will have to edit it.
 
 # Credits
 

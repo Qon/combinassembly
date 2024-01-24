@@ -7,7 +7,7 @@ let default_combinassembly = `# this is a comment, starts with the '#' and ends 
     set     [V] 16, [ic] 1
     jump    fibonacci_sequence_iterator
 :end
-    halt                              # the return value will be at register ic 0 when the program finishes.
+    halt                            # the return value will be at register ic 0 when the program finishes.
 
 :fibonacci_sequence_iterator
 
@@ -16,27 +16,29 @@ let default_combinassembly = `# this is a comment, starts with the '#' and ends 
 .define a [ic] 2
 .define i [ic] 3
 .define t [ic] 4                    # t is our temp variable and for comparing values.
-                                    # Reading 2 registers at once is possible if we read one ic register and one mc registers
-                                    # But just using ic registers and combining the two in t is pretty easy so I went with that
+                                    # Reading 2 registers at once is possible if we read
+                                    # one ic register and one mc registers.
+                                    # But just using ic registers and combining the two in
+                                    # t is pretty easy so I went with that.
 
-    mov     n, b                      # b = n      (I like putting return value in register [ic] 0)
-    branch  end, [V], [<=], 1, n      # if (n <= 1) return b
+    mov     n, b                    # b = n      (I like putting return value in register [ic] 0)
+    branch  end, [V], [<=], 1, n    # if (n <= 1) return b
 
-    set     [I] 2, i                  # i = 2      (We didn't jump to return so our loop variable can start here)
-    set     [V] 1, a                  # a = 1
-    set     [V] 1, b                  # b = 1
+    set     [I] 2, i                # i = 2      (We didn't jump to return so our loop variable can start here)
+    set     [V] 1, a                # a = 1
+    set     [V] 1, b                # b = 1
 
 :loop
-    mov     i, t                      # t = i      (i contains signal [I])
-    add     n, t                      # t += n     (n contains signal [V])
+    mov     i, t                    # t = i      (i contains signal [I])
+    add     n, t                    # t += n     (n contains signal [V])
     nop
     nop
-    branch  end, [I], [=], [V], t     # if (i == n) goto end       (values of i and n are both available in t)
+    branch  end, [I], [=], [V], t   # if (i == n) goto end       (values of i and n are both available in t)
 
-    const   [I] 1, i                  # ++i
-    mov     b, t                      # t = b
-    add     a, b                      # b += a
-    mov     t, a                      # a = t
+    const   [I] 1, i                # ++i
+    mov     b, t                    # t = b
+    add     a, b                    # b += a
+    mov     t, a                    # a = t
 
     jump    loop
 
