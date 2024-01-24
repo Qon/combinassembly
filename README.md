@@ -152,12 +152,18 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
 
 # TODO
 
-- More guides, example codes, language documentation
-- Improved error handling and reporting.
-- 2D layout (multiple columns) so that you can actually find a space where the program fits large programs.
-- Memory mapped IO language support
-- Entity JSON description for extensibility (any entity wired into the program, even from mods). Will also require support for differently sized entities. Possibility of removing operations `arith` and `decid` from language and supply them as "standard library" macros instead?
-- 1 tick jump possible?
+- More guides, example programs, language documentation
+- Editor and assembler improvements:
+    - Web editor should remember code on reload
+    - Improved error handling and reporting.
+    - 2D layout (multiple columns) so that you can actually find a space where the program fits large programs.
+- New language features
+    - Memory mapped IO language support
+    - Language features for connecting multiple parallel execution units (with their own instruction pointers) that can communicate with eachother through memory.
+    - Entity JSON description for extensibility (any entity wired into the program, even from mods). Will also require support for differently sized entities.
+        - Possibility of removing operations `arith` and `decid` from language and supply them as "standard library" macros instead?
+        - Will need blueprint string decoder added to interface
+    - 1 tick jump possible?
 
 # Credits
 
