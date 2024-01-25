@@ -163,7 +163,7 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
     - [v] ~~Web editor should remember code on reload~~
     - Improved error handling and reporting.
     - 2D layout (multiple columns) so that you can actually find a space where the program fits large programs.
-    - Fix cli to accept stdin and file parameter
+    - [v] ~~Fix cli to accept stdin and file parameter~~
 - New language features
     - Memory mapped IO language support
     - Language features for connecting multiple parallel execution units (with their own instruction pointers) that can communicate with eachother through memory.
@@ -182,9 +182,14 @@ or use another [simple file server of your choice](https://developer.mozilla.org
 
 Or
 
-    deno run cli.js
+    cat source.combasm | deno run cli.js
 
-cli.js currently only assembles the source from a local variable for now, so you will have to edit it.
+Though I would use this to get the blueprint string output in my clipboard automatically when I save the combinassembly source file source.combasm, when developing:
+
+    echo "source.combasm" | entr -s 'deno run cli.js <source.combasm | tee out.bp | xclip -selection clipboard'
+
+Though [FBE](https://fbe.teoxoy.com/) doesn't let you open up GUI for exact configuration on combinators or simulate execution, it can still be a useful tool for previewing blueprints since you can just Ctrl-V to import blueprint string and show it instantly.
+
 
 # Credits
 
