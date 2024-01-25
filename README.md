@@ -6,9 +6,9 @@
 
 ______
 
-## An "assembly" language for Factorio combinators
+## An assembly language for Factorio combinators
 
-Write simple "assembly" code, get a blueprint for a combinator network that can execute the code in Factorio!
+Write simple assembly code, get a blueprint for a combinator network that can execute the code in Factorio!
 Combinassembly is not a general purpose HDL for generating arbitrary combinator networks, instead operations execute sequentially(ish). The assembler does not generate a binary for a CPU, each instruction is a combinator (or several) which computes the operation directly.
 
 Combinassembly has registers and memory which it writes to and reads from. Instead of wiring combinators to eachother directly, everything goes through memory/register instead. How much memory and how many registers available is configured with assembly directives in your combinassembly source code.
@@ -162,12 +162,13 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
 - Editor and assembler improvements:
     - [v] ~~Web editor should remember code on reload~~
     - Improved error handling and reporting.
-    - 2D layout (multiple columns) so that you can actually find a space where the program fits large programs.
+    - 2D layout (multiple columns) so that you can actually find a space where large programs fits.
     - [v] ~~Fix cli to accept stdin and file parameter~~
 - New language features
     - Memory mapped IO language support
     - Language features for connecting multiple parallel execution units (with their own instruction pointers) that can communicate with eachother through memory.
-    - Entity JSON description for extensibility (any entity wired into the program, even from mods). Will also require support for differently sized entities.
+    - Entity JSON description for extensibility (any entity wired into the program, even from mods).
+        - Requires support for differently sized entities.
         - Possibility of removing operations `arith` and `decid` from language and supply them as "standard library" macros instead?
         - Will need blueprint string decoder added to interface
     - 1 tick jump possible?
@@ -186,7 +187,7 @@ Or
 
 Though I would use this to get the blueprint string output in my clipboard automatically when I save the combinassembly source file source.combasm, when developing:
 
-    echo "source.combasm" | entr -s 'deno run cli.js <source.combasm | tee out.bp | xclip -selection clipboard'
+    echo "source.combasm" | entr -s 'deno run cli.js <source.combasm | xclip -selection clipboard'
 
 Though [FBE](https://fbe.teoxoy.com/) doesn't let you open up GUI for exact configuration on combinators or simulate execution, it can still be a useful tool for previewing blueprints since you can just Ctrl-V to import blueprint string and show it instantly.
 

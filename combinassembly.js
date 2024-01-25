@@ -2076,7 +2076,7 @@ function run_assembler(codes) {
       blueprints.push(blueprint)
 
       if (codes.length == 1) {
-        return {tokens, parse_tree, 'bp-string': write_blueprint_string(blueprint), blueprint}
+        return {tokens, parse_tree, blueprint, 'bp-string': write_blueprint_string(blueprint)}
       }
     }
 
@@ -2093,10 +2093,10 @@ function run_assembler(codes) {
       }
       // console.log(write_blueprint_string(blueprint_book))
       let blueprint = blueprint_book
-      return {'bp-string': write_blueprint_string(blueprint), blueprint}
+      return {blueprint, 'bp-string': write_blueprint_string(blueprint)}
     }
     let blueprint = blueprints[0]
-    return {'bp-string': write_blueprint_string(blueprint), blueprint}
+    return {blueprint, 'bp-string': write_blueprint_string(blueprint)}
   } catch (error) {
     return {error}
   }

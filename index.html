@@ -35,7 +35,7 @@
         overflow-y: auto;
     }
 
-    #tabs-bar {
+    #tab-bar {
         background-color: #484944;
 /*        height: var(--tab-bar-height);*/
 /*        font-size: calc(var(--tab-bar-height) - 5px);*/
@@ -118,13 +118,13 @@
         font-size: 10pt;
 /*        overflow-y: auto;*/
     }
-    #tab-bp-string-content {
-        /*display: flex;
-        flex-direction: column;*/
+    .tab-content:not(:has(.editor)) {
+        display: flex;
+        flex-direction: column;
         overflow-x: auto;
         word-break: break-all;
     }
-    .tab-content:has(textarea):not(#tab-source-content) {
+    .tab-content:has(textarea):not(:has(.editor)) {
         display: flex;
     }
     .tab-content > textarea {
@@ -149,27 +149,19 @@
   </style>
 </head>
 <body>
-    <header id="tabs-bar">
-        <div id="tab-source" class="tab-btn">Source</div>
-        <div id="tab-error" class="tab-btn hidden">Error</div>
-        <div id="tab-tokens" class="tab-btn hidden">Tokens</div>
-        <div id="tab-parse_tree" class="tab-btn hidden">Parse tree</div>
-        <div id="tab-blueprint" class="tab-btn hidden">Blueprint</div>
-        <div id="tab-bp-string" class="tab-btn hidden">BP String</div>
-        <div style="flex-grow: 1"></div>
+    <header id="tab-bar">
+        <div id="tab-btn-source" class="tab-btn">Source</div>
+        <div id="tab-bar-separator" style="flex-grow: 1"></div>
         <div id="tab-assemble" class="tab-btn assemble">Assemble!</div>
     </header>
     <div id="main">
-        <div id="tab-source-content" class="tab-content">
+        <div id="tab-content-source" class="tab-content">
             <div class="editor-container">
                 <pre id="editor" class="editor"></pre>
+            </div>
         </div>
     </div>
-    <div id="tab-error-content" class="tab-content"><textarea spellcheck="false" readonly="true"></textarea></div>
-    <div id="tab-tokens-content" class="tab-content"><textarea spellcheck="false" readonly="true"></textarea></div>
-    <div id="tab-parse_tree-content" class="tab-content"><textarea spellcheck="false" readonly="true"></textarea></div>
-    <div id="tab-blueprint-content" class="tab-content"><textarea spellcheck="false" readonly="true"></textarea></div>
-    <div id="tab-bp-string-content" class="tab-content"></div>
+    <!-- <div id="tab-error-content" class="tab-content"><textarea spellcheck="false" readonly="true"></textarea></div> -->
 
     <script src="ace-src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <!-- <script src="pako.js" type="text/javascript" charset="utf-8"></script> -->
@@ -178,105 +170,138 @@
     <script type="module">
         import {run_assembler} from './combinassembly.js'
         import {default_combinassembly} from './default_combinassembly.js'
-        let i = 0
-        let editors = new Map()
-        for (let editor_el of document.querySelectorAll('.editor')) {
-            let id_name = 'editor' + i
-            editor_el.id = id_name
-            let editor = ace.edit(id_name)
+        let editor_counter = 0
+        let editors = new WeakMap()
+        function make_editor_elements(mode) {
+            let wrap = document.createElement('div')
+            wrap.classList.add('editor-container')
+            let pre = document.createElement('pre')
+            pre.classList.add('editor')
+            wrap.appendChild(pre)
+            return [wrap, pre]
+        }
+        function make_editor(editor_el, mode = 'json') {
+            if (!editor_el.id)
+                editor_el.id = 'editor' + editor_counter
+            let editor = ace.edit(editor_el.id)
             editors.set(editor_el, editor)
             editor.setOptions({
                 fontSize: '13pt',
                 wrap: false,
             })
             editor.setTheme("ace/theme/monokai")
-            editor.session.setMode("ace/mode/python")
-            ++i
+            editor.session.setMode(`ace/mode/${mode}`)
+            ++editor_counter
+            return editor
+        }
+
+        for (let editor_el of document.querySelectorAll('.editor')) {
+            make_editor(editor_el, 'python')
         }
 
         function select_tab(tab) {
-            for (let tab_btn_el of document.querySelectorAll('.tab-btn')) {
-                tab_btn_el.classList.remove('selected')
+            for (let tab_btn of document.querySelectorAll('.tab-btn')) {
+                tab_btn.classList.remove('selected')
             }
             for (let tab_content_el of document.querySelectorAll('.tab-content')) {
                 tab_content_el.classList.add('hidden')
             }
             tab.classList.add('selected')
-            let content_id = '#' + tab.id + '-content'
-            document.querySelector(content_id)?.classList.remove('hidden')
+            let content_id_selector = '#tab-content-' + tab.id.slice(8)
+            document.querySelector(content_id_selector)?.classList.remove('hidden')
         }
-        for (let tab_btn_el of document.querySelectorAll('.tab-btn')) {
-            if (tab_btn_el.id != 'tab-assemble') {
-                tab_btn_el.addEventListener('click', ev=>{
+
+        for (let tab_btn of document.querySelectorAll('.tab-btn')) {
+            if (tab_btn.id != 'tab-assemble') {
+                tab_btn.addEventListener('click', ev=>{
                     select_tab(ev.target)
                 })
             }
         }
-        // <textarea> might have been "restored" to earlier values by browser
-        document.querySelector('#tab-error-content textarea').value = ''
-        document.querySelector('#tab-tokens-content textarea').value = ''
-        document.querySelector('#tab-parse_tree-content textarea').value = ''
-        document.querySelector('#tab-blueprint-content textarea').value = ''
 
         document.querySelector('#tab-assemble').addEventListener('click', ev=>{
-            document.querySelector('#tab-error').classList.add('hidden')
-            document.querySelector('#tab-error-content textarea').value = ''
-            document.querySelector('#tab-tokens').classList.add('hidden')
-            document.querySelector('#tab-tokens-content textarea').value = ''
-            document.querySelector('#tab-parse_tree').classList.add('hidden')
-            document.querySelector('#tab-parse_tree-content textarea').value = ''
-            document.querySelector('#tab-blueprint').classList.add('hidden')
-            document.querySelector('#tab-blueprint-content textarea').value = ''
-            document.querySelector('#tab-bp-string').classList.add('hidden')
-            document.querySelector('#tab-bp-string-content').textContent = ''
-            let source = editors.get(document.querySelector('#tab-source-content .editor')).getValue()
+            for (let tab_btn of document.querySelectorAll('.tab-btn.output')) {
+                tab_btn.remove()
+            }
+            for (let tab_content of document.querySelectorAll('.tab-content.output')) {
+                let editor = editors.get(tab_content.querySelector('.editor'))
+                if (editor) editor.setValue('', -1)
+                let ta = tab_content.querySelector('textarea')
+                if (ta) ta.value = ''
+                if (!editor && !ta) tab_content.textContent = ''
+            }
+
+            let source = editors.get(document.querySelector('#tab-content-source .editor')).getValue()
             try {
+                // Save source in localStorage
                 window.localStorage.combinassembly_source = source
             } catch (e) {}
             let assembled = run_assembler(source)
-            // document.querySelector('#tab-bp-string-content textarea').value
 
-            if (assembled.error) {
-                document.querySelector('#tab-error-content textarea').value = assembled['error']
-                select_tab(document.querySelector('#tab-error'))
-                document.querySelector('#tab-error').classList.remove('hidden')
-                return
-            }
-            if (assembled.tokens) {
-                document.querySelector('#tab-tokens-content textarea').value = JSON.stringify(assembled['tokens'], null, 2)
-                document.querySelector('#tab-tokens').classList.remove('hidden')
-                select_tab(document.querySelector('#tab-tokens'))
-            }
-            if (assembled.parse_tree) {
-                document.querySelector('#tab-parse_tree-content textarea').value = JSON.stringify(assembled['parse_tree'], null, 2)
-                document.querySelector('#tab-parse_tree').classList.remove('hidden')
-                select_tab(document.querySelector('#tab-parse_tree'))
-            }
-            if (assembled.blueprint) {
-                document.querySelector('#tab-blueprint').classList.remove('hidden')
-                document.querySelector('#tab-bp-string').classList.remove('hidden')
-                document.querySelector('#tab-blueprint-content textarea').value = JSON.stringify(assembled['blueprint'], null, 2)
-                document.querySelector('#tab-bp-string-content').textContent = assembled['bp-string']
-                let frag = document.createDocumentFragment()
-                let notfrag = document.createElement('div')
-                notfrag.innerHTML = `<button class="blueprintbutton"><img width="32" height="32" src="https://wiki.factorio.com/images/Blueprint.png" style="vertical-align:middle"> Copy blueprint</button>`
-                let button = notfrag.firstChild
-                button.addEventListener('click', ev=>{
-                    navigator.clipboard.writeText(assembled['bp-string'])
-                })
-                frag.append(button)
-                frag.append(document.createElement('br'))
-                document.querySelector('#tab-bp-string-content').prepend(frag)
-                select_tab(document.querySelector('#tab-bp-string'))
+            let tab_bar = document.querySelector('#tab-bar')
+            let tab_bar_sep = document.querySelector('#tab-bar-separator')
+            let main_el = document.querySelector('#main')
+
+            for (let k in assembled) {
+                let v = assembled[k]
+
+                let tab_btn
+                tab_btn = document.createElement('div')
+                tab_btn.classList.add('tab-btn')
+                tab_btn.classList.add('output')
+                tab_btn.id = `tab-btn-${k}`
+                let tab_text = k.replaceAll(/_|-/g, ' ')
+                tab_text = tab_text[0]?.toUpperCase() + tab_text.slice(1)
+                tab_btn.textContent = tab_text
+                tab_btn.addEventListener('click', ev=>select_tab(ev.target))
+                tab_bar.insertBefore(tab_btn, tab_bar_sep)
+
+                let tab_content_id = `tab-content-${k}`
+                let tab_content = document.querySelector('#' + tab_content_id)
+                if (!tab_content) {
+                    tab_content = document.createElement('div')
+                    tab_content.classList.add('tab-content')
+                    tab_content.classList.add('output')
+                    tab_content.id = tab_content_id
+                    main_el.appendChild(tab_content)
+                }
+
+                let text = v
+                if (['number', 'object'].includes(typeof v)) {
+                    text = JSON.stringify(v, null, 2)
+                    let editor = editors.get(tab_content.querySelector('.editor'))
+                    if (!editor) {
+                        let [wrap, editor_el] = make_editor_elements()
+                        tab_content.appendChild(wrap)
+                        editor = make_editor(editor_el, 'json')
+                    }
+                    editor.setValue(text, -1)
+                } else {
+                    tab_content.textContent = text
+
+                    let frag = document.createDocumentFragment()
+                    let notfrag = document.createElement('div')
+                    notfrag.innerHTML = `<button class="blueprintbutton"><img width="32" height="32" src="https://wiki.factorio.com/images/Blueprint.png" style="vertical-align:middle"> Copy blueprint</button>`
+                    let button = notfrag.firstChild
+                    button.addEventListener('click', ev=>{
+                        navigator.clipboard.writeText(v)
+                    })
+                    frag.append(button)
+                    frag.append(document.createElement('br'))
+                    tab_content.prepend(frag)
+                }
+
+                select_tab(tab_btn)
             }
         })
-        select_tab(document.querySelector('#tab-source'))
+
+        select_tab(document.querySelector('#tab-btn-source'))
         let saved_source
         try {
             saved_source = window.localStorage.combinassembly_source
         } catch (e) {}
         let source = saved_source || default_combinassembly
-        editors.get(document.querySelector('#tab-source-content .editor')).setValue(source, -1)
+        editors.get(document.querySelector('#tab-content-source .editor')).setValue(source, -1)
     </script>
 </body>
 </html>
