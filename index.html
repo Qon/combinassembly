@@ -268,7 +268,9 @@
 
                 let text = v
                 if (['number', 'object'].includes(typeof v)) {
-                    text = JSON.stringify(v, null, 2)
+                    text = v instanceof Error ?
+                            `${v}\n    ${v.stack.split('\n').join('\n    ')}\n${JSON.stringify(v.cause, null, 4)}`
+                            : JSON.stringify(v, null, 2)
                     let editor = editors.get(tab_content.querySelector('.editor'))
                     if (!editor) {
                         let [wrap, editor_el] = make_editor_elements()
@@ -279,16 +281,20 @@
                 } else {
                     tab_content.textContent = text
 
-                    let frag = document.createDocumentFragment()
-                    let notfrag = document.createElement('div')
-                    notfrag.innerHTML = `<button class="blueprintbutton"><img width="32" height="32" src="https://wiki.factorio.com/images/Blueprint.png" style="vertical-align:middle"> Copy blueprint</button>`
-                    let button = notfrag.firstChild
-                    button.addEventListener('click', ev=>{
-                        navigator.clipboard.writeText(v)
-                    })
-                    frag.append(button)
-                    frag.append(document.createElement('br'))
-                    tab_content.prepend(frag)
+                    if (k != 'error') {
+                        let frag = document.createDocumentFragment()
+                        let notfrag = document.createElement('div')
+                        notfrag.innerHTML = `<button class="blueprintbutton"><img width="32" height="32" src="https://wiki.factorio.com/images/Blueprint.png" style="vertical-align:middle"> Copy blueprint</button>`
+                        let button = notfrag.firstChild
+                        button.addEventListener('click', ev=>{
+                            navigator.clipboard.writeText(v)
+                        })
+                        frag.append(button)
+                        frag.append(document.createElement('br'))
+                        tab_content.prepend(frag)
+                    } else {
+                        tab_content.textContent = text + '\n' + v.stack
+                    }
                 }
 
                 select_tab(tab_btn)

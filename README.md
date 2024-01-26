@@ -57,7 +57,7 @@ creates a constant combinator with the signals `[A]` to `[F]` with values 1 to 5
 The expression for the 1st argument to `const` can be thought of and used similarly to JavaScript objects:
 
 ```JavaScript
-let expr1 = ({["A"]: 1, ["B"]: 2, ["C"]: -3, ["E"]: 0b100, ["E"]: (1 + 0xA / 3) * 2 - 3})
+let expr1 = ({["A"]: 1, ["B"]: 2, ["C"]: -3, ["E"]: 0b100, ["E"]: (1 + Math.floor(0xA / 3)) * 2 - 3})
 let expr2 = {A: 1, B: 2, C: -3, D: 4, E: 5} // equivalent JS object again
 ```
 
@@ -162,7 +162,7 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
 - Editor and assembler improvements:
     - [v] ~~Web editor should remember code on reload~~
     - Improved error handling and reporting.
-    - 2D layout (multiple columns) so that you can actually find a space where large programs fits.
+    - 2D layout (multiple columns) so that you can actually find a space where a large program fits.
     - [v] ~~Fix cli to accept stdin and file parameter~~
 - New language features
     - Memory mapped IO language support
@@ -183,11 +183,13 @@ or use another [simple file server of your choice](https://developer.mozilla.org
 
 Or
 
-    cat source.combasm | deno run cli.js
+    deno run cli.js <source.combasm
 
-Though I would use this to get the blueprint string output in my clipboard automatically when I save the combinassembly source file source.combasm, when developing:
+Though I would use this:
 
-    echo "source.combasm" | entr -s 'deno run cli.js <source.combasm | xclip -selection clipboard'
+    echo "source.combasm" | entr -s "deno run cli.js <source.combasm | xclip -selection clipboard"
+
+to get the blueprint string output in my clipboard automatically when I save the combinassembly source file `source.combasm`, when developing combasm programs.
 
 Though [FBE](https://fbe.teoxoy.com/) doesn't let you open up GUI for exact configuration on combinators or simulate execution, it can still be a useful tool for previewing blueprints since you can just Ctrl-V to import blueprint string and show it instantly.
 

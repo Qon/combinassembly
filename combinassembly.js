@@ -265,7 +265,7 @@ function parse(tokens) {
 
   function eat(type, keyword) {
     if (tokens[t].token !== type) throw new Error(`eat() called with type '${type}' but found token with type '${tokens[t].token}' L:${tokens[t].line} C:${tokens[t].column}`, {cause: {function: 'eat', type, token: tokens[t]}})
-    if (keyword !== undefined && tokens[t].string !== keyword) throw new Error(`eat() expected keyword '${keyword}' but found '${tokens[t].string} L:${tokens[t].line} C:${tokens[t].column}`, {cause: {function: 'eat', type, keyword, token: tokens[t]}})
+    if (keyword !== undefined && tokens[t].string !== keyword) throw new Error(`eat() expected keyword '${keyword}' but found '${tokens[t].string}' L:${tokens[t].line} C:${tokens[t].column}`, {cause: {function: 'eat', type, keyword, token: tokens[t]}})
     let token = tokens[t]
     ++t
     // console.log(token)
@@ -345,6 +345,7 @@ function parse(tokens) {
       let value = parse_expression()
       return {node: 'directive', directive, name, value, lc: [lc.line, lc.column]}
     }
+    throw new Error(`PARSE_ERROR unknown directive '${directive.string}'`, {cause: directive})
   }
 
   function parse_label() {
@@ -475,8 +476,9 @@ function parse(tokens) {
       return {node: 'PARSE_ERROR', token: tokens[t]}
     }
   } catch (e) {
-    console.log(e)
-    return {node: 'PARSE_ERROR', token: tokens[t]}
+    throw e
+    // console.log(e)
+    // return {node: 'PARSE_ERROR', token: tokens[t]}
   }
   return {node: 'parse_tree', parse_tree}
 }
@@ -2027,11 +2029,13 @@ function write_blueprint_string(obj) {
 // print('code.js', codes)
 
 function run_assembler(codes) {
+  let sofar = {}
   try {
     if (!Array.isArray(codes)) codes = [codes]
 
     let blueprints = []
     for (let i = 0; i < codes.length; ++i) {
+      sofar.index = i
       let code = codes[i]
       // console.log(code)
 
@@ -2042,6 +2046,7 @@ function run_assembler(codes) {
         return {index: i, tokens}
         // continue;
       }
+      sofar.tokens = tokens
 
       let parse_tree = parse(tokens)
       // print('parse_tree.js', inspect(parse_tree))
@@ -2050,11 +2055,14 @@ function run_assembler(codes) {
         return {index: i, tokens, parse_tree}
         continue;
       }
+      sofar.parse_tree = parse_tree
 
       let assembled = assemble(parse_tree)
+      sofar.assembled = assembled
       // print('assembled.js', inspect(assembled))
 
       let entities = make_entity_composition(assembled)
+      sofar.entities = entities
       // print('entities.js', inspect(entities))
 
       let blueprint = {
@@ -2066,6 +2074,7 @@ function run_assembler(codes) {
           version: 281479278231552
         }
       }
+      sofar.blueprint = blueprint
 
       // print('blueprint.js', inspect(blueprint))
 
@@ -2098,7 +2107,8 @@ function run_assembler(codes) {
     let blueprint = blueprints[0]
     return {blueprint, 'bp-string': write_blueprint_string(blueprint)}
   } catch (error) {
-    return {error}
+    sofar.error = error
+    return sofar
   }
 }
 
