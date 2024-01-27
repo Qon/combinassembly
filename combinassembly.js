@@ -274,7 +274,7 @@ function parse(tokens) {
       let value = parse_expression()
       return {node: 'directive', directive, name, value, lc: [lc.line, lc.column]}
     }
-    throw new Error(`PARSE_ERROR invalid directive '${directive.string}'`, {cause: directive})
+    throw new Error(`Syntax error, invalid directive keyword '${directive.string}' at L:${directive.line} C:${directive.column}`, {cause: directive})
   }
 
   function parse_label() {

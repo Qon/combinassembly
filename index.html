@@ -8,7 +8,7 @@
 </head>
 <body>
     <header id="tab-bar">
-        <div id="tab-btn-source" class="tab-btn">Source</div>
+        <div id="tab-btn-source" class="tab-btn">Combinassembly</div>
         <div id="tab-bar-separator" style="flex-grow: 1"></div>
         <div id="tab-assemble" class="tab-btn assemble">Assemble!</div>
     </header>
@@ -103,8 +103,7 @@
 
                 let tab_btn
                 tab_btn = document.createElement('div')
-                tab_btn.classList.add('tab-btn')
-                tab_btn.classList.add('output')
+                tab_btn.classList.add('tab-btn', 'output')
                 tab_btn.id = `tab-btn-${k}`
                 let tab_text = k.replaceAll(/_|-/g, ' ')
                 tab_text = tab_text[0]?.toUpperCase() + tab_text.slice(1)
@@ -116,15 +115,13 @@
                 let tab_content = document.querySelector('#' + tab_content_id)
                 if (!tab_content) {
                     tab_content = document.createElement('div')
-                    tab_content.classList.add('tab-content')
-                    tab_content.classList.add('output')
+                    tab_content.classList.add('tab-content', 'output')
                     tab_content.id = tab_content_id
                     main_el.appendChild(tab_content)
                 }
 
-                let text = v
                 if (['number', 'object'].includes(typeof v)) {
-                    text = v instanceof Error ?
+                    v = v instanceof Error ?
                             `${v}\n    ${v.stack.split('\n').join('\n    ')}\n${JSON.stringify(v.cause, null, 4)}`
                             : JSON.stringify(v, null, 2)
                     let editor = editors.get(tab_content.querySelector('.editor'))
@@ -133,24 +130,18 @@
                         tab_content.appendChild(wrap)
                         editor = make_editor(editor_el, 'json')
                     }
-                    editor.setValue(text, -1)
+                    editor.setValue(v, -1)
                 } else {
-                    tab_content.textContent = text
+                    tab_content.textContent = v
 
-                    if (k != 'error') {
-                        let frag = document.createDocumentFragment()
-                        let notfrag = document.createElement('div')
-                        notfrag.innerHTML = `<button class="blueprintbutton"><img width="32" height="32" src="https://wiki.factorio.com/images/Blueprint.png" style="vertical-align:middle"> Copy blueprint</button>`
-                        let button = notfrag.firstChild
-                        button.addEventListener('click', ev=>{
-                            navigator.clipboard.writeText(v)
-                        })
-                        frag.append(button)
-                        frag.append(document.createElement('br'))
-                        tab_content.prepend(frag)
-                    } else {
-                        tab_content.textContent = text + '\n' + v.stack
-                    }
+                    let frag = document.createDocumentFragment()
+                    let notfrag = document.createElement('div')
+                    notfrag.innerHTML = `<button class="blueprintbutton"><img width="32" height="32" src="https://wiki.factorio.com/images/Blueprint.png" style="vertical-align:middle"> Copy blueprint</button>`
+                    let button = notfrag.firstChild
+                    button.addEventListener('click', ev=>navigator.clipboard.writeText(v))
+                    frag.append(button)
+                    frag.append(document.createElement('br'))
+                    tab_content.prepend(frag)
                 }
 
                 select_tab(tab_btn)
