@@ -158,7 +158,12 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
 
 # TODO
 
-- More guides, example programs, language documentation
+- Documentation
+    - More guides
+    - Example programs
+    - Better macros
+    - Language documentation
+    - Add LICENSE
 - Editor and assembler improvements:
     - [v] ~~Web editor should remember code on reload~~
     - Improved error handling and reporting.

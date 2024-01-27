@@ -66,53 +66,9 @@ function* combinatorial(...alts) {
   }
 }
 
-// const os = require('os');
-// const { deflate, unzip } = require('zlib');
-
-// const input = '.................................';
-// deflate(input, (err, buffer) => {
-//   if (err) {
-//     console.error('An error occurred:', err);
-//     process.exitCode = 1;
-//   }
-//   console.log(buffer.toString('base64'));
-// });
-
-// const buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');
-// unzip(buffer, (err, buffer) => {
-//   if (err) {
-//     console.error('An error occurred:', err);
-//     process.exitCode = 1;
-//   }
-//   console.log(buffer.toString());
-// });
-
-// // Or, Promisified
-
-// const { promisify } = require('util')
-// const do_unzip = promisify(unzip)
-// const do_deflate = promisify(deflate)
-
-// do_unzip(buffer)
-//   .then((buf) => console.log(buf.toString()))
-//   .catch((err) => {
-//     console.error('An error occurred:', err);
-//     process.exitCode = 1;
-//   });
-
-// function inspect(s) {
-//   return Deno.inspect(s, {
-//       showHidden: false,
-//       depth: null,
-//       maxArrayLength: null
-//   })
-// }
-
 function inspect(s) {
   return JSON.stringify(s, null, 2)
 }
-
-// let fs = require('fs')
 
 function print(name, str) {
   console.log(name, str)
@@ -123,29 +79,6 @@ function print(name, str) {
     }
   })
 }
-
-let str = '0eNqdUl1rhDAQ/C/7HA/1FK+B/pKjSOKl7XL5kCRK5fC/N4lcFU764ONMdmdmhzyAy0H0FrVvuTF3oI+VcUCvGxjfsDN6oR1+aSYj56deAAX0QgEBzVRETjEpM8lUDzMB1DfxA7SYPwgI7dGjWFQSmFo9KC5sGNjbJ9AbF1aMjm5BJqvzU01gAnquTnWQD6G8NbLl4puNaGyc69B2A/o2vN3+lj/ROt++RB/R+iEwq3uayLhk3R0WA+dZrCCPQPXMMh994B3mOV6VrqebsgiMwrrkW16Kqnkrm0t5Luq6XPvIZ3K032eiLKThqFOaQ0XvCb02XjXbxg8fXOxtZunjEWCdx1G0z27+0Zt/Ab8y56E='
-// let str = '0eNq1klFKxDAQhu8yz3HZ1m275ioiJW1HHWgmIUkXS8kBvIUPejFPYtL6IAgKhX2cf+b/Zz6YBbpxQuuIA8gFqDfsQd4v4OmJ1Zi1MFsECRRQgwBWOlcD9jSgu+mN7ohVMA6iAOIBX0AW8UEAcqBAuKWtxdzypDt0aeCvHAHW+GQ1nLfnuErADLI6VGnFQA77rVkKSOcGZ8a2w2d1oWROju/INvWGNcZnNYMFlSmP2aatcus2CZ+vH5AlOyfLxKF9dEa3xHZKw8FNGGMUvxDKPQjN1RDediDc7kGor4bw/i9C+qr1C+WPpxVwQee3S87Fqbkrm3NR18eijvELwiQCQw=='
-// let str = '0eNqVkEEPgjAMhf/LO+8AkzjYXzHEgDbYBDrChpGQ/XcZXox68dbX9H197Yq2n2mcWALsCr448bCnFZ47afrUC8tIsOBAAxSkGZLyc+tDE9gJogLLlR6weawVSAIHphdlF8tZ5qGlaRv45VcYnee93LZtGJMpLLDHaiMLcXdr3Twlnq6j+mLqf5il+WTmdQq9H2fffqFwp8nvfl3mham0KbNDURVFjE9M1GZe'
-// let str = '0eNqVkVtOxDAMRffi7xR1hqKZyVYQitLWZSxaJ0rSQlV1AeyCtbESnBYhJCQEn37cY197gbof0QfiBHoBahxH0PcLRHpk2+dcmj2CBko4gAK2Q45abKjFUDRuqIltcgFWBcQtvoA+rA8KkBMlwp22BbPhcagxSMNvHAXeRZE6ztMFdywVzKCL8uZOZrQUsNmrRwWybwquNzVe7USiFskn00it3TgxZzsKMZkftiYKaZTM10Z7R+GJn7KliBnzd10zW846MeRt2AxpeH99k0Y3Jj/+Y4Xnq9x8Z/lZ3IycTBfcYIiFA7qzfcR1zcfenqO//VLBhCHuVzofqtPleDqXt9Wlqtb1A/Zarac='
-// let str = '0eNqVVU2PmzAQ/S8+w2oJVZNy7HelSr1U2l1VlWVgAlZgHNkmH0L899pACCUc7Bsev3nvjT14WpJWDRwlR02SlvBMoCLJn5YoXiCrbExfj0ASwjXUJCDIaruSkDVS8ROEU74KVcYQQZIuIBxzuJAk6v4GBFBzzWHg7RdXik2dGmQSuTEG5CiUIRFoHRni0CReSbIxUpoVykZL4EVpqngOxk/6UMOJS92YyCQ6IMLv1rICrTkOXCcwVgaxWuT0brE3Fx6rRhmSCUWip/gpinsW45gyCWw02i6kXk3ewk3Xl7IEvq0CzzzX5SP4ZRV8O5H2odw19J5X2l7JEv11BT3B+9NKK4YHkuxZpcCcQCnOVIISjczspc/DgIZCYA223eYbacOrfDj9ebgohdKLmG1ERQXSQooG83HTOMrM8mapwaxkUkPed7WiNhPvPFNj/F+qKSQ7rB6OoUAomDb9OROs+H6vvBQ+ubNrJgvQfvRf3OnPbLxtZ/Kf7uSz6/cQ+OUuMOsXD4GP7gK3zvNg/+bO/tDDHjI/PFpIAijKMKdSZAe/an57yAiaAs3BDg8tm8z3t/vsKtXdX8Dn8cv9kX+xpJc+8+Ke9To+zybr6p71Zp5IO/r6oZnMZuxsaGx20bvth812u4t3cfy+6/4BjRmaSw=='
-// let str = '0eNqtUdFKxTAM/Zc814vbrm6W+ycio9uiBta0dN3ljtF/N+18EARB8SWQk3NOTsgOw7yiD8QR9A40Ol5AP++w0BubOWNx8wgaKKIFBWxs7iYcacJwNzo7EJvoAiQFxBPeQFfpRQFypEh4uJVm63m1AwYh/OSjwLtFpI7z9lthb1JPD7JhooDjMasVSNoY3NwP+G6uJFoRfDr2MpuKy5LRfFc0+cj7LLPehLJMwwUy4DcRrBz71+BsT+xXocawYkpJfctf/yF//U/5q1/nl2eU5+kvv1ZwxbAcObrq3D7Vbds1XdM8pvQBrx64fA=='
-// let str = '0eNqVkN0KgzAMhd/lXHeCf9P1VYYMf4IU2ii2jon03de6G2G72U0gycn5kuzo9ErzothB7lD9xBbyvsOqkVsda26bCRLKkYEAtyZm1rRaX3RrZngBxQO9IFPfCBA75RR9XI5ke/BqOlqC4Ne8wDzZMDJxpEWbIikFNsgqKYN5WImpj30bBWkM40LEZ4IaIDPfeO/FFzX7j1r/R00Pajj8eJA8/VPgSYs9CFmdFtUtq6o6r/P86v0byI18HQ=='
-// let str = '0eNrNU8lqwzAQ/Zc5K6HemlT0T0owsj1NB6yRkOVQE/TvlexQDG1C0lMvhlnehkdnaPoRrSP2IM9AreEB5NsZBjqy6lPPTxZBAnnUIICVTlWHLXXoNq3RDbHyxkEQQNzhJ8gsHAQge/KEC9tcTDWPukEXF27xCLBmiFDDST3RlQImkOW2ihIdOWyXYS4g2vXO9HWDH+pEERwRF8o6zrqZZkjdFMyrlPIpwbRVblaT8AqpYacIGNnX787omtiOcdW7EUOYZXhRnbmy9HHYraNRrIpwCHH9R9z8L3Grfx+3vBK3+I47aNX3m15p+0vMfFut/uudmvFyWnLtSH4pV/IXSwKODpHvNVs+ZrZ6xGx+22xx1exySHE6Pzq5eqMCTuiG5R72Wbl7yXe7fbEviucQvgCSVUv8'
-
-// let str = '0eNrNl92OqjAQx99lrutGvgRJziOcKy9PDEEYdRIopBTPEsO7bwuuHyso7K7r3mgK7b8zv5nplD2skhJzQVyCvweKMl6A/28PBW14mOhnssoRfCCJKTDgYapHoSC5TVFSNImydEU8lJmAmgHxGF/BN2p2VyPGiGIU3QJmvWSAXJIkbC1qBlXAy3SFQu1wxxYGeVao1RnXBijFiecxqNS/ZRsvjtopJoFRO8FkoDyXIkuCFW7DHSkBteqkHKjXcaNW6BdrEoUMrvzbkZClenI0rZ0xERhr1wrUKlqqkKEGrnzIchRhawRM1MKslHk5VrquG/t5605joal/NgKRn8OjWJNlF2NLrSURlSSboVEvtd4Vb/O0cxomySQJ07wL8uzFucTcBfZ9wyPVz0M90ZzqQZqHoom/D3+gg4vRy8W45GD2cLBu5W8HD2ds0h1kvyXjbsEZn2u4Q1HJLfFNq51XysiSy2AtsjQgrsTAl6LEr3JnbfpqJz5Mtoclqz0ySNZTgvR/qw7EXximDu7WVZBYdzTtMdF0PqnaF3ZnfE8wntUTWj8f1BUO4n194X5hfWwSs2EBmI2rO9d7St0d0f/+unNuh8XtiYM7rFm7859q1oOQj+AyMB+9ox3v+95JyKvby1lK2t141pRIFD235j4ef1sW5aHej7fmZZcX89HHmmv3ejF77LG2eNSRthh1nBnTnowwpgNLw/mp0lh8Y1nMu+6wqqk2H17+2bceA3VYFe1J6xm2Ozdd17M8y5rV9RsUdNZU'
-// let str = '0eNrtWttu4jAQ/Rc/hwqPcwNpP2Gf+riqUAC3WCIXOU53UcW/r520QBMb7KQ3Li+tQpyJfc54PHMmL2i+rmjBWSbQ9AWxRZ6VaPrnBZXsKUvW6jexKSiaIiZoijyUJam6SjgTq5QKthgt8nTOskTkHG09xLIl/YemeOudtLGkC7akXG8Atg8eoplggtFmRvXFZpZV6Zxy+YYTc/FQkZfy6TxTE5AWR3HsoY38T3xyF8g3LRmni2YAeEiuXPB8PZvTVfLMpAH51N7yTN5e1tZKdeOR8VLMOut7ZlxU8pfd1JoRI06XamklVVaUqVIkCnC5hrygPGkmgUbywbwSReVqerut5581y6lnCOqPunkAHVs2K2V8UTFRX2IF8xOnNGsPJIrBg+ug86B6bYcWGEALXD4t2EALfo+u9H75rJFDbEui3yIxtCOR7JeTJuv1aJ2khY658C54v6V0bL29cEdVf6b2FI3VRVokvHaqKfqFHMD2jXhpaNDh47vjA2eET3vrAxgBAzvAgmNBXwNc4BqpX81+SDw4hqJ7JKDPlG/EimVPje1iIydZZWL2yPN0xjJpDE0Fr6gDQaHt/ncKK7FdcAj7cgk3LjWod87V1t4jtlyDC9eRHdeRI9fkW7j+u5KJ5VnuXHNgjVzYxOOeZk28x315JzfebXa5maDYhfdJT6sm2ifuyTv+rpqqWecnpe+vxh3qqg5v78M4tq672nvZxJUa15ssuA6y6t2oRXky4LDscGtdjoFlEY2xW/yN4m85d3es/vz42z0hWxweqQnhRIamKaqPHNVwfCIQ2lVUGPq6CLm5iN1h2vIQYvYQ7OQBliIDtlRhoslXqTBWZLpsSvtD0TeB5LuDBOcFkvXpgju6TWRCba/HvM3yRPToKH0H8cPXg/nI1oJyQzfBhN7vBrnqNTXYdRMeHAALzQiFJkDCAYDATwckaPtFbEZIN1YPWeScf0a+EbLwc/PP+8/KPe/dVH6ntBPHbS4mluljbBkUg68KivcfGRAj26oXxi0AydiE2GSAM5PLdmaw5KGTF5vAhrG7e5LzcU9rUQabQisM6W3j622imhVwfXiA01q7nh9w7//hi+iPgmXtAqRvkwjfmkRDGn7g9iGBb+nwft9+AL71A/TIE+skxndiNOhr18h9MEBnxteuM2s6cw77ESykRi1nYV9xEN/EQct91ZVavlQdhMhd+MJnJXxBOFgdhHiArIMvUOeCIXUuvlLRxulTDKPEQHpUvfhsql5wrXrl7fpr8OnBB+gekpG7bI6dGPvRBKIoJjEh4Xb7H1IU9oQ='
-// let str = '0eNrtXMty6jgQ/RetzZT1sGRTdZd3MYtZZVYzlaJ4KIlqwFDGZIZK8e8jmzyILZluOyT4xpsUBrslndMtdZ8mPJHZcqc3mUlzMn4iZr5Ot2T89xPZmvt0uizey/cbTcbE5HpFApJOV8XVQs/NQmej+Xo1M+k0X2fkEBCTLvR/ZEwPwVkD08zkDyudm7nbBjvcBkSnucmNPs6ovNhP0t1qpjM7yKupYs75NM1PDQVks97aZ9dpMQNrbxTHv0UB2dtXXNmXdiT7XJ6tl5OZfpg+GvuQvfPOLHOdeSB4NFm+s++8jny8Y0RJaW1XYEhPULg9DpLqeTGRbWGJFn8yvThdkbFXdmpzk813Ji8vi2cPBYqVRTPsotXFFv1n90Ur2KL529Cr6XI5Wk5XG9daJWStLwPazxavj9+ZbJtPwEsvlnI0X1JAxmFxsdpMs5KGMflBDnAU5MmSSxiUBwfRFH0OPCpoLEx2nE3pRi5sns2+YbO9DDgBWe/yzQ5hVD/qbJ8/mPT+aHuzn5SuN7nL1quJSa0xMs6zne6Ce1J3x4CwbgEbITnjX8LZvw92c+4Ha7TCmnjPQ3ls3Gdap2cIY43squrN7weNa+TDBq1OnnKP20jsPs/e9r7kZe+DwMmb4axNWHiXGp95MnSYcq5dIUOGDiHTzLE/JhQmJiJopAGP9RjHs4q/hOfjCnvBc9S8adUj0E9h9WxkEnM2Vu9mHg9IkLucih273Mdks394stkAYeOn0wZD2bhx2lAoG787bcQFCXUOaAjLrgvAPye7BkUcIizAh3XN6X2JOMXWnkpdtePOltP5Px/gvH99gPP+RDkvth5WtRrx5BgRn0DLbQe/rXhn4nXk4iO34wJLaRV9VrDftA10WI7/HjLuSzmpwPoRb5lvy4bdxzO36Ixm5pK6XuamgKnSm+UPKf63urAyeePVhsB6oy2r5STIqEXGVJp2eIMvCaESuu9TBVACnNTIDtTIX58abw2PqsV5BCYyru6RIZBIhZcYVY8kxmqVb4HyYhjBcnca4yGTPYKstilw/9ZNgfUOTdoquGpQcB0cnRGrHNGPcPqG8pYBmzVhW7rlQLcrJJNmvrkC8y1RfFMg37St2C8H5dKNfAjVHKscnTAKut/LKWvLqRo4BUVxA6cMFaW8rV0v9xyf3tOvqrxeVbNLJPjPxhHVV527s4Kyjy0BZEt0YEt+D7b8yokjeppiDVyScWApzaK23SA5dIPcHIkzEeivAevBWWkSh926Qc3WfNUTk21dRA0uAjwy6w2Qdt1+xwbR4CHxmWkAJQmm8K0s1atWFvzUrDV7WexDLcajJvuFGvi0YlXRR3jPq6RD50ldeeeJ1honod/RXPe6v8YZdoBMXjlkLKl6Dmtqz9XvdUNG0TmtEl7I5GVz2ptL5bM3qOYCR2WyvJaNcOCXkhm+lSqvs5XqgoVCi2kuqgD6mqycd3Bm9Ws7MwPyQKEdbS7w7qn6455grYdWW1/cu9d26bNH37iZK3HKK5fnZXs3QRLfcYz61HH0F+QcWAFx1bbjFA0dJ0D/gaIYasg6YqDLx227D9HQfXAjr8CJTYxiNGlr18t90kHPjr69ni26xCMDCJ7O/9AL20qU0SBRAuOqLtD4ymyUBgkVGQXFy2VRr+QyAT70vJqi6PK97OjKpZ4GMcyrfYkutW/0TYUcitnCvbKDaFEJR72phAW4En4ufO3H5Q8xjE9++CEgdufeHo+dmAqVMKViHnNbqh3+B+gWj+Q='
-
-
-// let str = '0eNqtlGFPgzAQhv/LfYZF6OYmib/EGFLgdBdpS8qxSBb+u1fQbSq6EP2y7KB9+vJcc0co6g4bT5YhOwKVzraQPRyhpWer6/CM+wYhA2I0EIHVJlRhHWvLcelMQVaz8zBEQLbCV8iSIbpK0J54b5CpnGekw2MEaJmYcIo0Fn1uO1Ogl0N+DRNB41rZ62xIILx4k642EfTyT6VqtRlCxi/I9Eq679C1ukRGUJHHclogMAnG3tV5gXt9IAHIrjM5l9fVSGvDiyfyLeffrB3IcydPTtGmFXFR6/Il+GoxcPIPCaMY16DXUwyIZavruOmWw8VR+AY7fdKYMg0/HqvLjpBUa1lJvuyIxzIZHoc5w+p8ktF1HdfaNHNak8+9mlf5ceDJ4180nv3dhMI02o89z+AeZjwkf/OwPuWosKQK/ZVrdrP0mr1j/+mO/SZn+e3CA/qe92SfJ3bTS8zOcv7kncnJCgwy9h0u8J5+9p5eOA+1+qEPm4VDRO2uDpHbpcjtF6TMvXFUZhezOQJx1k4N3yXr7V263e7UTqnbYXgDlBf3Fg=='
-// let str = '0eNrtmMFuozAQht/FZ7LCOASC1CdZVcgBNxktGGRMtFHEu68N2yQNdoOhPVTtBWEYjz/+GcYDZ7QrWlYL4BIlZwRZxRuU/D6jBvacFvqaPNUMJQgkK5GHOC31SNtJyuUqq8odcCorgToPAc/ZX5TgznvogQqQh5JJyMw+gu7ZQ4xLkMAGpH5wSnlb7phQi7wL46G6atTcimsC5W8VBr9CD53UGSHqVK2k5nGWaZtGG2F9ECy/XQzUKNIke8EYN9zpOv2sd2jBg6ccw63JW7QcxEDWO1OgUlRFumMHegTlQM26ek7V7Rwuj/ECopHpSP0jCNmqKxe0wWK1K2j2R+veMO0nfRWzF7iqmaADBlqpqVUr69bdeTcWO7CIvVaWILIWZD/EVu23I0NjKMgVqaRFsSpoWZv0x4bkGGn+uuBF8CV6X4X29aCsqeiTI0FPqJuenZMFwzaJ1hfEnGWQM/EgVX3XVP3v9oPy9D3d3DOUHZk4yQPw/eC7PinMlsv0RVRlClw5Q4kULXMISfA2JMGN5npM7CEKpiV16Fj6SDyz9OHQzhpa4DaucNFcOHthxrbKHC3YNLAT3F3QYzvr2NKIHi9A9z93v9su2O/w99jverGNoo6qxbOabdseDRXCllb+tFqi7WYHz//uwds6BW89MSTYvWnBX6ppmZ7G5K46YmITLZjbxuCfNsYYpO37bQy2B22U596892BG8+5/rfdgefeOZ7fv/k/em4PiP0j85Q08XtLBO/Wh4T38xgpvMjXTbxbQ+5/9/YGjBR8gTtpu7gWzN/kmUzN9vIDe/9jPJ3W7/2eX3Pwk9JB645qhXMR4HW2DKIpJTMim6/4BNE7pbw=='
-// let str = '0eNrtW99vozgQ/l/8TFb4Bxgi7eu9rnSvp1VEEre1NkBETG+jiv/9TLi2WeMBG19XFzUvVUkGM/5mxvN9k+QFbQ+tODayUmj9guSurk5o/dcLOsnHqjj0r6nzUaA1kkqUKEJVUfZXvZ0qKrXa1eVWVoWqG9RFSFZ78ROtcRfNrlA0Uj2VQsmdfQ3SfY+QqJRUUgwuXS7Om6ott6LRD5l0JkLH+qTvraveA73eirIvSYTO/X88+5LoJ+n7KrHrbU69Ee7/NGJ//TCpr7Lek8dGiMryTtf1ezVcIzO7HDtHDNf2shk8uyymHVVNfdhsxVPxLPUC+q73lTf67b1828aDbE5qM0L/WTaq1a+8uTZYrLaHYvejx/0k+nU2r2BqgOM4jlB9FE0xeIJW+u66VcfWf/1ujDcB8GbaUja7VqrLJQbhx2RkaQ0HffepLA6H1aEoj7YYUEuCjHB/feAb6CGYv4Md9xflsWguCbJGX1HnnqHuiKUAROzNxb3Yyb1oZtKV+Kbrv8v+R7k6hZt/iopn0ZzVk6weh7WPZ+1mW6nNQ1OXG1npxdBaNa3wCImRmuQK8/6awiFK3JI68Tz+SLzw+MPw+YehAzD1dA7nC50jMehc/5bVOR7QOFK/xvFr0Ame6CRjU6vzWYDz3CvshkcczoKxpdX13DdjuYn7/DHzIA9KNACFgepfVg/1UPltf6SsyAyRgdbZ1+pqGXxNZTxwx+bJYUcTxwFw8o+Ec0gSGxDYCwjiCAQOYFvp/4dtfSTVumDsxKGGXIWoWW6UOqauzIOkbm0Nh3Bn/tmj6RVMHJvRTJx5JHaMJl3KK9M7r3RsD0YMmQezNDhHPg7qRPZAbR4zf7mV3pTccj/1tN4yMIYYM06WVgq/V4ojf4hGWhgIG5suFEv8XwvFT4ng1L9U+G2VinNLoZaDzA4aD1C+XvrNjPMog0zVRsmUVB7b2veXBezPS+Il5n5gjWcztXufB0j/1FP6G4iyqVnA2NY+uo0D/PdC32wNOAfdT2eIGrEsZd9dyNA88dkdNxuf6SNxbqKWpYDdkYDdMa/cM1sChZuJ1dbuP/XWPpT8Gp3fp32+WXWP8YHBtz8XkIE/YNFjD8UUTTV1J5g7zPfUTc3K+KBxylVLHsZTC+cprgqcJAGDJfaRSPSbesdh6ZTu7yepRPicjnDHxEoDBhrJJxpo2DBmzhOI6VEHmWFyFukLnebcsYp4QNjZp59jpV7RNdkpxc6qI3cMZ+av1JKbUmruJaCVmQE3pG9JvnSokdyHGo50ZjxfgsJGp6calqKZqDlQvtLYv1LYTVWK++lCTNHPoEqheGmlsHulOPKz8aEFhS2frhTmVykJFHMSMOjxEuOYz/CdETgT30/hFlv7/mjA/rzkODX9Z/Agzmpr958FjIL84mN+rtrnDIS/zdbufxLgvx/+Mx9KUZMxMDi/rLb2/aUB4x7qNe6B0wkcRlEeMFCgv3WgwJYNFFy5M80CBgr0Br6pQnO3UQDNAzQh/dyjAMqdJfm0WKSZQze3fkV2AbGlt/U1YnfZDPFYtpjH0juPdTxcxpICihL2+5wa7LQshKl6ddoJ4gnyTEYDeI6fdzAto8nMsTI0BX375Wcw66vf3URIp81pyPkMM54TzjOaUZp23T//c4O6'
-
-// let str = '0eNqV09tugzAMBuB38XWoRoFCuetzTFXFwQVr4KAQ6BDKuy+h0tRJ2TQuE/3+nETOCmU34aCINeQrUCV5hPx9hZEaLjq3p5cBIQfS2IMALnq3cjldsA4q2ZfEhZYKjADiGj8hD81VALImTfjktsVy46kvUdnAn5CAQY62VrLrb734kAhYIH87JLaJLdFKdrcS22Imm7ehO3Ua1S9Hn0npye58N30mghA2bXJ3D18OL3YYF69x3GVULVYfXifa5RDfpZeJdzEKa6+S7FIahYuXOe1iaqm9SupVfg7pQ8oa2T3v6EeyfyCkJAcNFip4tIid1zmbq3Ejv1XmL19KwGynchvkYxbG6fmYplmURdHJmC+NOie+'
-// let str = '0eNqlVNtugzAM/Rc/TmkFAdaC9idThQK4raWSoBCqoSr/vgS23tYL1XhA2LHPOT4yOUCx67DRJA1kB6BSyRayzwO0tJFi53OmbxAyIIM1MJCi9pGvM0KaWanqgqQwSoNlQLLCL8hCy54iCE1mW6Oh8jYGtysGKA0ZwlHSEPS57OoCtSN5KIZBo1rXq6RX4PBmYRDNEwa9+4x4PE8cVUUay7EmZh5GjmHre0L/0lidc5OLuKskXXZkhjC0K2v9vFfy+JNJbwkM78rjgzyj1S4vcCv25BBc2wk6d8cVHcWvSbcm/zUGsoBBi77kMqca1GJkgDdwY0w1wU/NgN85jaZZFB0tqrCkCvVjf9L0VXt+YK+8uXDAMTZCD4wZfIBPNL1r6KTJ11rVOcmmc6VGd/iCP1dLwh/aldzxJ35xw9P304InExd8oxHlVEHJPwT944+L/pjJbuuOB93udLhqsrO7jcEedTvuyjKMFylfuIcvg8Dab/KMsl4='
-// let str = '0eNp9j8EOgjAQRP9lz4VILVb7K8aYAhuzCd2SthgJ4d9t4eLJ287m7czsCt044xSIE5gVqPccwdxXiPRiO5ZdWiYEA5TQgQC2rqjCJcup6r3riG3yATYBxAN+wDTbQwByokR42O1iefLsOgwZ+GskYPIx33ou+dmvaqSuWwFLHs9a1W2OGihgfzCqxO39zM87At4Y4g7Ia6P0TWqtT1pe1LZ9AQQnUaU='
-let ztr = '0eJx9j8EOgjAQRP9lz4VILVb7K8aYAhuzCd2SthgJ4d9t4eLJ287m7czsCt044xSIE5gVqPccwdxXiPRiO5ZdWiYEA5TQgQC2rqjCJcup6r3riG3yATYBxAN+wDTbQwByokR42O1iefLsOgwZ+GskYPIx33ou+dmvaqSuWwFLHs9a1W2OGihgfzCqxO39zM87At4Y4g7Ia6P0TWqtT1pe1LZ9AQQnUaU='
 
 function deepcopy(obj) {
   return JSON.parse(JSON.stringify(obj))
@@ -278,11 +211,8 @@ function parse(tokens) {
 
   function parse_macro() {
     let lc = eat('%')
-    // eat('identifier', 'macro')
     let macro = eat('identifier')
     let parameters = parse_list(()=>eat('identifier'))
-    // console.log(macro)
-    // let parameters = eat('number')
     eat('EOL')
     let brace_counter = 0
     let operations = []
@@ -302,7 +232,7 @@ function parse(tokens) {
           let bracket = eat('}')
           operations.push(bracket)
           if (brace_counter < 0)
-            throw new Error(`Closing bracket without matching opening bracket encountered L:${bracket.line} C:${bracket.column}`)
+            throw new Error(`Closing bracket without matching opening bracket encountered L:${bracket.line} C:${bracket.column}`, {cause: bracket})
         }
         eat('EOL')
         continue;
@@ -311,8 +241,7 @@ function parse(tokens) {
       operations.push(operation)
     }
     let pct_token = eat('%')
-    // eat('identifier', 'endmacro')
-    if (brace_counter > 0) throw new Error(`Macro ended with brackets left opened L:${pct_token.line} C:${pct_token.column}`)
+    if (brace_counter > 0) throw new Error(`Macro ended with brackets left opened L:${pct_token.line} C:${pct_token.column}`, {cause: pct_token})
     eat('EOL')
     return {node: 'macro', macro, parameters, operations, lc: [lc.line, lc.column]}
   }
@@ -345,7 +274,7 @@ function parse(tokens) {
       let value = parse_expression()
       return {node: 'directive', directive, name, value, lc: [lc.line, lc.column]}
     }
-    throw new Error(`PARSE_ERROR unknown directive '${directive.string}'`, {cause: directive})
+    throw new Error(`PARSE_ERROR invalid directive '${directive.string}'`, {cause: directive})
   }
 
   function parse_label() {
@@ -431,54 +360,48 @@ function parse(tokens) {
     return node
   }
 
-  try {
-    for (; t < tokens.length;) {
-      if (peek() == 'identifier') {
-        let node = parse_operation()
-        parse_tree.push(node)
-        while (peek() == '}') {
-          parse_tree.push(eat('}'))
-        }
-        eat('EOL')
-        continue;
+  for (; t < tokens.length;) {
+    if (peek() == 'identifier') {
+      let node = parse_operation()
+      parse_tree.push(node)
+      while (peek() == '}') {
+        parse_tree.push(eat('}'))
       }
-      if (peek() == ':') {
-        let node = parse_label_definition()
-        parse_tree.push(node)
-        continue;
-      }
-      if (peek() == '%') {
-        let node = parse_macro()
-        parse_tree.push(node)
-        continue;
-      }
-      if (peek() == '.') {
-        let node = parse_directive()
-        parse_tree.push(node)
-        continue;
-      }
-      if (peek() == '{') {
-        let node = eat('{')
-        parse_tree.push(node)
-        continue;
-      }
-      if (peek() == '}') {
-        while (peek() == '}') {
-          parse_tree.push(eat('}'))
-        }
-        eat('EOL')
-        continue;
-      }
-      if (peek() == 'EOL') {
-        eat('EOL')
-        continue;
-      }
-      return {node: 'PARSE_ERROR', token: tokens[t]}
+      eat('EOL')
+      continue;
     }
-  } catch (e) {
-    throw e
-    // console.log(e)
-    // return {node: 'PARSE_ERROR', token: tokens[t]}
+    if (peek() == ':') {
+      let node = parse_label_definition()
+      parse_tree.push(node)
+      continue;
+    }
+    if (peek() == '%') {
+      let node = parse_macro()
+      parse_tree.push(node)
+      continue;
+    }
+    if (peek() == '.') {
+      let node = parse_directive()
+      parse_tree.push(node)
+      continue;
+    }
+    if (peek() == '{') {
+      let node = eat('{')
+      parse_tree.push(node)
+      continue;
+    }
+    if (peek() == '}') {
+      while (peek() == '}') {
+        parse_tree.push(eat('}'))
+      }
+      eat('EOL')
+      continue;
+    }
+    if (peek() == 'EOL') {
+      eat('EOL')
+      continue;
+    }
+    throw new Error(`Syntax error, wrong token type '${tokens[t].token}' at L:${tokens[t].line} C:${tokens[t].column}`, {cause: tokens[t]})
   }
   return {node: 'parse_tree', parse_tree}
 }
@@ -971,35 +894,10 @@ function decode_rich_text_token(signal) {
 
   let expanded_string = s
 
-  // [virtual-signal=signal-everything]
-  // [virtual-signal=signal-anything]
-  // [virtual-signal=signal-each]
-  // [virtual-signal=signal-0]
-  // [virtual-signal=signal-9]
-  // [virtual-signal=signal-A]
-  // [virtual-signal=signal-Z]
-  // [virtual-signal=signal-red]
-  // [virtual-signal=signal-green]
-  // [virtual-signal=signal-blue]
-  // [virtual-signal=signal-yellow]
-  // [virtual-signal=signal-pink]
-  // [virtual-signal=signal-cyan]
-  // [virtual-signal=signal-white]
-  // [virtual-signal=signal-grey]
-  // [virtual-signal=signal-black]
-  // [virtual-signal=signal-check]
-  // [virtual-signal=signal-info]
-  // [virtual-signal=signal-dot]
-
-
   let vcheck = /^everything|anything|each|[0-9A-Z]|red|green|blue|yellow|pink|cyan|white|grey|black|check|info|dot$/
   if (vcheck.test(s)) {
     expanded_string = 'virtual-signal=' + 'signal-' + s
   }
-  // if (expanded_string.slice(0, 'signal-'.length) == 'signal-' && vcheck.test(expanded_string.slice('signal-'.length))) {
-  //   expanded_string = 'virtual-signal=' + expanded_string
-  // } else
-
 
   let position = expanded_string.search(/=/)
   if (position == -1) {
@@ -1012,10 +910,6 @@ function decode_rich_text_token(signal) {
   let type = s.substring(0, position)
 
   if (type == 'virtual-signal') type = 'virtual'
-
-  // if (position >= 0) {
-  //   ++position
-  // }
   let name = s.substring(position + 1)
   return {type, name}
 }
@@ -1078,8 +972,7 @@ function generate_ip(config) {
     pulse_converter: 'arithmetic-combinator',
     pulse_generator: 'decider-combinator',
     nl0: 'newline',
-    // pulse_extender1: {name: 'decider-combinator', direction: 6},
-    pulse_extender0: {name: 'decider-combinator', direction: 6},
+    pulse_extender: {name: 'decider-combinator', direction: 6},
     nl1: 'newline',
     reset_neg_b: 'arithmetic-combinator',
     reset_neg_black: 'arithmetic-combinator',
@@ -1124,8 +1017,8 @@ function generate_ip(config) {
       }
     }
   }
-  if (line.pulse_extender0) {
-    line.pulse_extender0.control_behavior = {
+  if (line.pulse_extender) {
+    line.pulse_extender.control_behavior = {
       decider_conditions: {
         first_signal: {type: 'virtual', name: 'signal-each'},
         constant: 0,
@@ -1136,7 +1029,7 @@ function generate_ip(config) {
     }
   }
   if (line.pulse_extender1) {
-    line.pulse_extender1.control_behavior = line.pulse_extender0.control_behavior
+    line.pulse_extender1.control_behavior = line.pulse_extender.control_behavior
   }
   if (line.converter) {
     line.converter.control_behavior = {
@@ -1198,14 +1091,14 @@ function generate_ip(config) {
   connect('red', line.pulse_starter, line.pulse_converter)
   connect('green', line.pulse_starter, line.pulse_generator)
   connect('red', line.pulse_converter, line.pulse_generator)
-  connect('red', line.pulse_generator, line.pulse_extender0)
-  connect('green', line.pulse_generator, line.pulse_extender0, 2, 2)
+  connect('red', line.pulse_generator, line.pulse_extender)
+  connect('green', line.pulse_generator, line.pulse_extender, 2, 2)
   if (line.pulse_extender1) {
-    connect('green', line.pulse_extender0, line.pulse_extender1, 2, 2)
+    connect('green', line.pulse_extender, line.pulse_extender1, 2, 2)
     connect('green', line.pulse_extender1, line.converter)
-    connect('red', line.pulse_extender0, line.pulse_extender1)
+    connect('red', line.pulse_extender, line.pulse_extender1)
   } else {
-    connect('green', line.pulse_extender0, line.converter)
+    connect('green', line.pulse_extender, line.converter)
   }
   connect('green', line.converter, line.reset_neg_b)
   connect('green', line.reset_neg_b, line.reset_neg_black, 1, 1)
@@ -1242,17 +1135,11 @@ function generate_memory_line(address, config, rom, context) {
     query_address: 'constant-combinator',
     query_lamp: 'small-lamp',
     query_gate: 'decider-combinator',
-
-    // out_jump: 'constant-combinator',
-    // ip_bus: 'constant-combinator',
   }
   for (let k in line) {
     line[k] = {name: line[k]}
   }
   if (rom.has(address)) {
-    // delete line.write_address
-    // delete line.write_lamp
-    // delete line.write_gate
     delete line.cell
 
     line.rom.control_behavior = {filters: []}
@@ -1550,7 +1437,7 @@ function generate_line(operation, compute_combinators, {regbus, input_colored_co
     memqw: 'constant-combinator',
     out_jump: 'constant-combinator',
   }
-  if (!mem_size /*context.globals_address.size*/) {
+  if (!mem_size) {
     delete line.input
     delete line.memqw
   }
@@ -1707,7 +1594,6 @@ function generate_line(operation, compute_combinators, {regbus, input_colored_co
   if (!successfully_connected_wire_color) {
     line.precompute.name = 'space'
   }
-  // console.log(inspect({operation}), inspect(line.compute), inspect(line.address))
   if (line.compute && !['newline', 'space'].includes(line.compute.name)) connect(flip[IP_BUS_COLOR], line.compute, line.address)
   else if (line.compute === undefined) throw new Error(`Unknown operator '${operation.operator.string}' L:${operation.operator.line} C:${operation.operator.column}`)
 
@@ -1776,7 +1662,6 @@ function make_entity_composition(assembled) {
 
   let entities = []
   let compute_combinators = []
-  // let lines = []
   let code_line
 
   let y = 0
@@ -1822,7 +1707,7 @@ function make_entity_composition(assembled) {
     arr_line_ip = []
     let x = 0
     for (let k in line_ip) {
-      if (/*registers_count > 9 && */line_ip[k].name == 'newline') continue
+      if (line_ip[k].name == 'newline') continue
       let w = 1 + ['arithmetic-combinator', 'decider-combinator'].includes(line_ip[k].name)
       if (x + w > IP_LINES_WIDTH) {
         arr_line_ip.push({name: 'newline'})
@@ -1831,10 +1716,8 @@ function make_entity_composition(assembled) {
       }
       arr_line_ip.push(line_ip[k])
       x += w
-      // if (registers_count > 9 && line_ip[k].name != 'constant-combinator') arr_line_ip.push({name: 'newline'})
     }
   }
-  // if (registers_count > 9) arr_line_ip.pop()
   let x = +!!mem_size
   let padding = REGISTERS_HEIGHT - IP_LINES_HEIGHT
   while (padding-- > 0) arr_line_ip.unshift({name: 'newline'})
@@ -1844,12 +1727,12 @@ function make_entity_composition(assembled) {
 
 
   // Registers
-  // if (registers_count > 20) throw new Error(`Register count > 20 currently now supported`)
+  // if (registers_count > 20) throw new Error(`Register count > 20 currently not supported`)
   let registers = []
   let regbus = []
   let register_line_entities = []
 
-  let REG_SPACE_SIZE = IP_LINES_WIDTH + !!mem_size // (registers_count > 9 ? 3 : 5) + !!mem_size
+  let REG_SPACE_SIZE = IP_LINES_WIDTH + !!mem_size
   let REG_WIDTH = 3 * ((registers_count > 0) + (registers_count > 9))
   for (let i = 0; i < registers_count; ++i) {
     let line = generate_register(config)
@@ -1915,13 +1798,11 @@ function make_entity_composition(assembled) {
     ;({x, y} = position_entities(line, x, y))
 
     if (line.registers && registers_count) {
-      // regbus.push(line.registers)
       let last = regbus.length - 1
       let prev = last - registers_count
       connect('red', regbus[prev], regbus[last])
       connect('green', regbus[prev], regbus[last])
       if (registers_count > 9) {
-        // regbus.push(line.registers1)
         let last = regbus.length - 2
         let prev = last - registers_count
         connect('red', regbus[prev], regbus[last])
@@ -2035,6 +1916,7 @@ function run_assembler(codes) {
 
     let blueprints = []
     for (let i = 0; i < codes.length; ++i) {
+      sofar = {}
       sofar.index = i
       let code = codes[i]
       // console.log(code)
@@ -2044,7 +1926,6 @@ function run_assembler(codes) {
       if (tokens[0].token == 'TOKEN_ERROR') {
         console.log(i, tokens[0])
         return {index: i, tokens}
-        // continue;
       }
       sofar.tokens = tokens
 
@@ -2053,7 +1934,6 @@ function run_assembler(codes) {
       if (parse_tree.node == 'PARSE_ERROR') {
         console.log(i, parse_tree)
         return {index: i, tokens, parse_tree}
-        continue;
       }
       sofar.parse_tree = parse_tree
 
@@ -2078,12 +1958,7 @@ function run_assembler(codes) {
 
       // print('blueprint.js', inspect(blueprint))
 
-      // let generated_bp_str = write_blueprint_string(blueprint)
-      // print('generated_bp_str.txt', generated_bp_str)
-      // console.log(i)
-      // console.log(generated_bp_str)
       blueprints.push(blueprint)
-
       if (codes.length == 1) {
         return {tokens, parse_tree, blueprint, 'bp-string': write_blueprint_string(blueprint)}
       }
@@ -2111,42 +1986,6 @@ function run_assembler(codes) {
     return sofar
   }
 }
-
-  // write_blueprint_string(blueprint).then(generated_bp_str=>{
-  //   print('generated_bp_str.txt', generated_bp_str)
-  //   console.log(generated_bp_str)
-  // })
-
-/*
-[virtual-signal=signal-everything]
-[virtual-signal=signal-anything]
-[virtual-signal=signal-each]
-[virtual-signal=signal-2]
-[virtual-signal=signal-B]
-[virtual-signal=signal-grey]
-[virtual-signal=signal-red]
-[virtual-signal=signal-check]
-[item=copper-cable]
-[item=iron-gear-wheel]
-[item=electric-engine-unit]
-*/
-
-/*
-[entity=crude-oil]
-[virtual-signal=signal-curclose]
-[virtual-signal=sl-own-x]
-[virtual-signal=signal-stopname-richtext]
-[virtual-signal=spidersentinel-tag-marker]
-[entity=cliff]
-[entity=autodrive-passenger]
-[entity=tree-09]
-[entity=behemoth-biter-corpse]
-[entity=tree-09-stump]
-[item=<artillery-shell:slowdown-capsule>]
-[item=<artillery-shell:atomic-bomb>]
-[item=spidersentinel-spider-mother-item]
-[item=spider-mother]
-*/
 
 export {
   run_assembler

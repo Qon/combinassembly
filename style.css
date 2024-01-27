@@ -1,0 +1,122 @@
+:root {
+  --tab-bar-height: 30px;
+}
+
+body {
+    background-color: #272822;
+    color: #f8f8f2;
+    height: 100vh;
+    margin: 0;
+    font-family: "Helvetica";
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+}
+
+#main {
+    flex-grow: 1;
+    height: 100vh;
+    max-width: 100vw;
+    display: flex;
+    flex-direction: column; 
+    overflow-y: auto;
+}
+
+#tab-bar {
+    background-color: #484944;
+    grid-row: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+}
+.tab-btn:not(.assemble) {
+    border-radius: 10px 10px 0 0;
+}
+.tab-btn:hover {
+    background-color: #373833;
+}
+.tab-btn.selected.selected {
+    background-color: #282923;
+}
+.tab-btn.selected:hover {
+}
+
+.tab-btn.assemble {
+    background-color: green;
+}
+.tab-btn.assemble:hover {
+    background-color: lime;
+    color: black;
+}
+
+.editor-container {
+    position: relative;
+    height: 100%;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+.output-container {
+}
+
+.tab-content {
+    height: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.editor {
+    margin: 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.tab-content {
+    flex-grow: 1;
+    font-family: monospace;
+    font-size: 10pt;
+}
+.tab-content:not(:has(.editor)) {
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+    word-break: break-all;
+}
+.tab-content:has(textarea):not(:has(.editor)) {
+    display: flex;
+}
+.tab-content > textarea {
+    font-size: 10pt;
+    flex-grow: 1;
+    background-color: #272822;
+    color: #f8f8f2;
+    resize: none;
+}
+
+.blueprintbutton {
+    background-color: rgb(19, 93, 144);
+    color: rgb(221, 221, 221);
+    line-height: 46px;
+    width: 180px;
+    cursor: pointer;
+    border: 2px solid;
+    border-color: rgb(50, 139, 200) rgb(11, 54, 84) rgb(11, 54, 84) rgb(50, 139, 200);
+}
