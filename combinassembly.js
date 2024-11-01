@@ -699,6 +699,67 @@ function assemble(parse_tree) {
 }
 
 
+//                                      ,,
+// `7MM"""Mq.                         `7MM
+//   MM   `MM.                          MM
+//   MM   ,M9  .gP"Ya `7MMpMMMb.   ,M""bMM  .gP"Ya `7Mb,od8
+//   MMmmdM9  ,M'   Yb  MM    MM ,AP    MM ,M'   Yb  MM' "'
+//   MM  YM.  8M""""""  MM    MM 8MI    MM 8M""""""  MM
+//   MM   `Mb.YM.    ,  MM    MM `Mb    MM YM.    ,  MM
+// .JMML. .JMM.`Mbmmd'.JMML  JMML.`Wbmd"MML.`Mbmmd'.JMML.
+
+
+
+function render_expanded(assembled) {
+  let defines_kvs = []
+  for (let kv of assembled.defines.entries()) defines_kvs.push(kv)
+  for (let kv of assembled.context.labels.entries()) defines_kvs.push(kv)
+
+  let defines = defines_kvs.map(([k, v])=>`.define ${k} ${opand_render(v, true)}`).join('\n')
+
+  let ops = assembled.operations.map(op=>{
+    if (op.node != "operation") return "default_string :("
+    return `${' '.repeat(4)}${op?.operator?.string} ${
+      op?.operands?.map(opand=>opand_render(opand, true)).join(', ')
+    }`.padEnd(80, ' ')
+      + `# ip:${(''+op.address).padStart(5, ' ')}, line: ${op.lc_macros.map(([l,c,m])=>(''+l).padStart(4, ' ')).join(' ')}`
+  }).join('\n')
+
+  let o = []
+  if (defines != '') o.push(defines)
+  if (ops != '') o.push(ops)
+  return o.join('\n')
+
+  function opand_render(opand, skip_parens) {
+    if (Array.isArray(opand)) {
+      if (opand.length == 0) return ''
+      if (opand.length == 1) return opand_render(opand[0])
+      let s = opand.map(opand_render).join(' ')
+      if (skip_parens) return s
+      return '(' + s + ')'
+    }
+
+    if (opand === undefined) return ''
+    if (typeof opand == 'number') return opand
+    if (opand.node == 'signals') return signals_render(opand.signals)
+    if (opand.token == 'identifier') return opand.string
+    if (opand.token == 'number') return opand.string
+    return opand.token
+  }
+
+  function signals_render(signals) {
+    return signals.map(signal=>signal_render(signal)).join(' ')
+  }
+
+  function signal_render(signal) {
+    let s = `[${signal.name.string}]`
+    let s2 = opand_render(signal.value)
+    if (s2 == '') return s
+    return `${s} ${s2}`
+  }
+}
+
+
 
 //              ,,                                         ,,
 // `7MM"""Yp, `7MM                                         db              mm
@@ -1941,6 +2002,9 @@ function run_assembler(codes) {
       sofar.assembled = assembled
       // print('assembled.js', inspect(assembled))
 
+      let expanded = render_expanded(assembled)
+      sofar.expanded = expanded
+
       let entities = make_entity_composition(assembled)
       sofar.entities = entities
       // print('entities.js', inspect(entities))
@@ -1960,7 +2024,7 @@ function run_assembler(codes) {
 
       blueprints.push(blueprint)
       if (codes.length == 1) {
-        return {tokens, parse_tree, blueprint, 'bp-string': write_blueprint_string(blueprint)}
+        return {tokens, parse_tree, assembled, expanded, blueprint, 'bp-string': write_blueprint_string(blueprint)}
       }
     }
 

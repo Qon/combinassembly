@@ -44,7 +44,9 @@
             editor.setOptions({
                 fontSize: '13pt',
                 wrap: false,
+                fixedWidthGutter: true,
             })
+            editor.setKeyboardHandler("ace/keyboard/sublime")
             editor.setTheme("ace/theme/monokai")
             editor.session.setMode(`ace/mode/${mode}`)
             ++editor_counter
@@ -120,15 +122,25 @@
                     main_el.appendChild(tab_content)
                 }
 
-                if (['number', 'object'].includes(typeof v)) {
-                    v = v instanceof Error ?
-                            `${v}\n    ${v.stack.split('\n').join('\n    ')}\n${JSON.stringify(v.cause, null, 4)}`
-                            : JSON.stringify(v, null, 2)
+                if (k != 'bp-string'/*['number', 'object'].includes(typeof v)*/) {
+                    if (typeof v != "string") {
+                        let replacer = function(key, value) {
+                            if (value instanceof Map) {
+                                let o = {}
+                                for (let [kk, vv] of value.entries()) o[kk] = vv
+                                return o
+                            }
+                            return value
+                        }
+                        v = v instanceof Error ?
+                                `${v}\n    ${v.stack.split('\n').join('\n    ')}\n${JSON.stringify(v.cause, null, 4)}`
+                                : JSON.stringify(v, replacer, 2)
+                    }
                     let editor = editors.get(tab_content.querySelector('.editor'))
                     if (!editor) {
                         let [wrap, editor_el] = make_editor_elements()
                         tab_content.appendChild(wrap)
-                        editor = make_editor(editor_el, 'json')
+                        editor = make_editor(editor_el, k == 'expanded' ? 'python' : 'json')
                     }
                     editor.setValue(v, -1)
                 } else {
