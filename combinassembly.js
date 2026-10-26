@@ -192,12 +192,12 @@ function parse(tokens) {
 
   function peek() {
     if (t >= tokens) {
-      throw new Error(`peek() called expecting a token but found EOF`)
+      throw new Error(`Parse Error: Expected a token but found EOF`)
     } else return tokens[t].token
   }
 
   function eat(type, keyword) {
-    if (tokens[t].token !== type) throw new Error(`eat() called with type '${type}' but found token with type '${tokens[t].token}' L:${tokens[t].line} C:${tokens[t].column}`, {cause: {function: 'eat', type, token: tokens[t]}})
+    if (tokens[t].token !== type) throw new Error(`Parse Error: Expected token with type '${type}' but found token with type '${tokens[t].token}' L:${tokens[t].line} C:${tokens[t].column}`, {cause: {function: 'eat', type, token: tokens[t]}})
     if (keyword !== undefined && tokens[t].string !== keyword) throw new Error(`eat() expected keyword '${keyword}' but found '${tokens[t].string}' L:${tokens[t].line} C:${tokens[t].column}`, {cause: {function: 'eat', type, keyword, token: tokens[t]}})
     let token = tokens[t]
     ++t
@@ -206,7 +206,7 @@ function parse(tokens) {
   }
 
   function fail(type) {
-    if (tokens[t].token == type) throw new Error(`fail() called with type '${type}' but token with type '${tokens[t].token} matched anyways L:${tokens[t].line} C:${tokens[t].column}'`, {cause: {function: 'fail', type, token: tokens[t]}})
+    if (tokens[t].token == type) throw new Error(`Parse Error: Expected to find a token not of type '${type}' but token with type '${tokens[t].token} matched anyways L:${tokens[t].line} C:${tokens[t].column}'`, {cause: {function: 'fail', type, token: tokens[t]}})
   }
 
   function parse_macro() {
@@ -236,6 +236,9 @@ function parse(tokens) {
         }
         eat('EOL')
         continue;
+      }
+      if (peek() == ':') {
+        operations.push(parse_label_definition())
       }
       let operation = parse_operation()
       operations.push(operation)
@@ -463,20 +466,28 @@ function assemble(parse_tree) {
 
   let addressed_units = []
 
+  let UID = 0
   function push_macro(node, macro_lc) {
     // console.log(inspect({push_macro: node}))
     let macro = macros.get(node.operator.string)
+    let modified_labels = new Map()
     for (let op of macro.operations) {
-      push_operation(op, macro_lc, node.operands, macro.parameters)
+      if (op.node == 'label') {
+        // op.label.string = op.label.string + '_' + UID++
+        modified_labels.set(op.label.string, op.label.string + '_' + UID++)
+      }
+    }
+    for (let op of macro.operations) {
+      push_operation(op, macro_lc, node.operands, macro.parameters, modified_labels)
     }
   }
 
-  function push_expression(expr, macro_lc, macro_args, parameters) {
+  function push_expression(expr, macro_lc, macro_args, parameters, modified_labels) {
     // console.log('push_expression()', inspect({expr, macro_args}))
     // console.log()
     if (expr.node == 'signals') {
       for (const signal of expr.signals) {
-        push_expression(signal.value, macro_lc, macro_args, parameters)
+        push_expression(signal.value, macro_lc, macro_args, parameters, modified_labels)
       }
     } else {
       for (let i = 0; i < expr.length; ++i) {
@@ -487,22 +498,26 @@ function assemble(parse_tree) {
           expr[i] = macro_args[n]
         } else if (parameters && el.token == 'identifier' && -1 != (idx = parameters.map(q=>q.string).indexOf(el.string))) {
           expr[i] = macro_args[idx]
+        } else if (parameters && el.token == 'identifier' && modified_labels.has(el.string)) {
+          let new_tok = deepcopy(el)
+          new_tok.string = modified_labels.get(el.string)
+          expr[i] = new_tok
         } else if (el.node == 'signals') {
-          push_expression(el, macro_lc, macro_args, parameters)
+          push_expression(el, macro_lc, macro_args, parameters, modified_labels)
         } else if (Array.isArray(el)) {
-          push_expression(el, macro_lc, macro_args, parameters)
+          push_expression(el, macro_lc, macro_args, parameters, modified_labels)
         }
       }
     }
   }
 
-  function push_operation(node, macro_lc = [], macro_args, parameters) {
+  function push_operation(node, macro_lc = [], macro_args, parameters, modified_labels) {
     if (macro_args !== undefined) {
-      if (node.node == 'label') throw new Error(`Found illegal label definition '${node.label.string}' inside macro  L:${node.line} C:${node.column}`)
+      // if (node.node == 'label') throw new Error(`Found illegal label definition '${node.label.string}' inside macro  L:${node.lc[0]} C:${node.lc[1]}`, {cause: node})
       node = deepcopy(node)
       for (let j = 0; node.operands != undefined && j < node.operands.length; ++j) {
         let operand = node.operands[j]
-        push_expression(operand, [...macro_lc, node.lc], macro_args, parameters)
+        push_expression(operand, [...macro_lc, node.lc], macro_args, parameters, modified_labels)
       }
     }
     if (macros.has(node.operator?.string)) {
@@ -510,7 +525,11 @@ function assemble(parse_tree) {
       push_macro(node, [...macro_lc, [...node.lc, node.operator.string]])
     } else {
       // node.lc_macros = [...macro_lc, node.lc]
-      if (node.node) node.lc_macros = [...macro_lc, [...node.lc, node.operator.string]]
+      if (node.node && node.operator) node.lc_macros = [...macro_lc, [...node.lc, node.operator.string]]
+      if (node.node == 'label') {
+        node = deepcopy(node)
+        node.label.string = modified_labels.get(node.label.string)
+      }
       addressed_units.push(node)
     }
   }
@@ -528,7 +547,7 @@ function assemble(parse_tree) {
           if (!value_keywords.includes(g.name.string)) {
             globals_size.set(g.name.string, g.value)
           } else {
-            throw new Error(`Value keyword '${g.name.string}' is not allowed as global L:${g.name.line} C:${g.name.column}`)
+            throw new Error(`Value keyword '${g.name.string}' is not allowed as global L:${g.name.line} C:${g.name.column}`, {cause: g})
           }
         })
       } else if (node.directive.string == 'rom') {
@@ -537,7 +556,7 @@ function assemble(parse_tree) {
         if (!value_keywords.includes(node.name.string)) {
           defines.set(node.name.string, node.value)
         } else {
-          throw new Error(`Value keyword '${g.name.string}' is not allowed as defined expression identifier L:${g.name.line} C:${g.name.column}`)
+          throw new Error(`Value keyword '${g.name.string}' is not allowed as defined expression identifier L:${g.name.line} C:${g.name.column}`, {cause: g})
         }
       }
     } else if (node.node == 'operation') {
@@ -695,7 +714,7 @@ function assemble(parse_tree) {
 
   context.dynamic = new Map()
 
-  return {operations, defines, mem_size, rom, config, context}
+  return {addressed_units, operations, defines, mem_size, rom, config, context}
 }
 
 
@@ -713,16 +732,22 @@ function assemble(parse_tree) {
 function render_expanded(assembled) {
   let defines_kvs = []
   for (let kv of assembled.defines.entries()) defines_kvs.push(kv)
-  for (let kv of assembled.context.labels.entries()) defines_kvs.push(kv)
+  // for (let kv of assembled.context.labels.entries()) defines_kvs.push(kv)
 
   let defines = defines_kvs.map(([k, v])=>`.define ${k} ${opand_render(v, true)}`).join('\n')
 
-  let ops = assembled.operations.map(op=>{
-    if (op.node != "operation") return "default_string :("
-    return `${' '.repeat(4)}${op?.operator?.string} ${
-      op?.operands?.map(opand=>opand_render(opand, true)).join(', ')
-    }`.padEnd(80, ' ')
-      + `# ip:${(''+op.address).padStart(5, ' ')}, line: ${op.lc_macros.map(([l,c,m])=>(''+l).padStart(4, ' ')).join(' ')}`
+  let ops = assembled.addressed_units.map(op=>{
+    switch (op.node) {
+    case 'operation':
+      return `${' '.repeat(4)}${op?.operator?.string} ${
+        op?.operands?.map(opand=>opand_render(opand, true)).join(', ')
+      }`.padEnd(80, ' ')
+        + `# ip:${(''+op.address).padStart(5, ' ')}, line: ${op.lc_macros.map(([l,c,m])=>(''+l).padStart(4, ' ')).join(' ')}`
+    case 'label':
+      let k = op.label.string
+      let v = assembled.context.labels.get(k)
+      return `.define ${k} ${opand_render(v, true)}`
+    }
   }).join('\n')
 
   let o = []
@@ -871,7 +896,7 @@ function resolve_global(identifier, context) {
   for (const n in context) {
     if (context[n].has(identifier.string)) return context[n].get(identifier.string)
   }
-  throw new Error(`Identifier '${identifier.string}' with no value used L:${identifier.line} C:${identifier.column}`)
+  throw new Error(`Identifier '${identifier.string}' with no value used L:${identifier.line} C:${identifier.column}`, {cause: identifier})
 }
 
 function resolve_expression(expr, context) {
@@ -896,7 +921,7 @@ function _resolve_expression(expr, context) {
       // console.log('expr', inspect(expr))
       return expr
     }
-    throw new Error(`resolve_expression with non-Array expr, wrong type '${inspect(expr)}'`)
+    throw new Error(`resolve_expression with non-Array expr, wrong type '${inspect(expr)}'`, {cause: {expr, context}})
   }
 
   if (expr.length == 0) return 0
@@ -2024,7 +2049,7 @@ function run_assembler(codes) {
 
       blueprints.push(blueprint)
       if (codes.length == 1) {
-        return {tokens, parse_tree, assembled, expanded, blueprint, 'bp-string': write_blueprint_string(blueprint)}
+        return {/*tokens, parse_tree, assembled,*/ expanded, 'blueprint-JSON': blueprint, 'bp-string': write_blueprint_string(blueprint)}
       }
     }
 
