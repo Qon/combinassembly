@@ -185,13 +185,15 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
 
 # Executing
 
-If python3 is installed then run something like:
+*NEW* Firefox devtools now include "Local Mode", a simple file server. Just open index.html and the devtools and at the top of devtools you will be prompted to run the file through "Local Mode". Once configured (just press the buttons to proceed) you get the web tool executed locally without any additional software.
+
+Alternativly, if you are using a browser without local mode and python3 is installed then run something like:
 
     python3 -m http.server
 
 or use another [simple file server of your choice](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/set_up_a_local_testing_server) from project directory and navigate to <localhost:8000>
 
-Or
+Or from command line if you want to avoid using a browser, install `deno` to run JavaScript files:
 
     deno run cli.js <source.combasm
 
