@@ -15,6 +15,14 @@ Combinassembly has registers and memory which it writes to and reads from. Inste
 
 Instruction pointer is in a special register, which is interacted with slightly differently but can be used to make jumps and conditional branching.
 
+## Motivation
+
+There are other languages for defining circuits that gives you a blueprint from mathematical expressions. And while they can make many kinds of circuits much simpler to create than wiring combinators by hand in game and also easier to get into than assembly programming, they still are about signal flow and functions. Making such things in text is more organised and easy, but I am capable of doing it manually in game so the benefit is reduced. And they abstract away timing and control flow. 
+
+But for some more intricate classes of problems I need another computational model that lets me write normal programs like a programmer, where I get explicit control of timing and deal with computation directly. Combinassembly was made to solve problems that require a stack, function calls, recursion, iteration loops, timing and data structures in a RAM. It grew out of needing to send a sequence of commands to advanced entities like the `Blueprint Deployer` and `Scanner` from `Recursive Blueprints+` mod to read data from and send commands for a complete self building factory. And for that I need to do binary search, communicate with other factory cells, compute what should be built next etc. And while a lot can be done by making finite state machines, that's annoying to have to think about how those could solve a problem when I already know how I would write a program to solve it.
+
+So while mathematical expressions like `100 / ((A * B) + (C % D))` don't just simply become a circuit that computes the expression and you have to write assembly for that (unless it's just constants, then the assembler can fold the expression for you), you do gain the power to reason about time and sequencing input and output. And maybe `Combinassembly` will be a target for a higher level language in the future?
+
 # Quick start
 
 ## Comments
