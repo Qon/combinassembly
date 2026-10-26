@@ -102,6 +102,10 @@ The macro system gives a powerful way to extend the language with new combinatio
 
 # Define macro `jump`
 %jump     label # parameter list with `,` separated identifiers that you can use inside the macro
+:ip             # label definitions work inside macros as well and will be modified in macro expansion
+                # so that each expansion gets a unique label. "ip" is always defined as a label to the 
+                # current operation where it is used so here I would actually recommend against defining
+                # it, but it works and is here for demonstration purposes.
     const   [J] ip + 2 - label, [jump]
     nop
 %   # end of macro definition
@@ -136,7 +140,7 @@ The other directive is `.global` which is used to create RAM. It also defines co
 .define stack_size  4
 ```
 
-define the named constants `foo` to 0, `bar` to 1, `heap` to 2, `stack` to 12 and `memsize` to 16. The numerical expression after the name specifies the size, not the value of the name. The order of the `.global` lines matter internally, but they are also hoisted and the constants can be used before or after, the value after the identifier becomes the sum of all `.global` expressions before it. With no numerical expression the size defaults to 1. Since the sum of all `.global` sizes is 16, a RAM circuit with 16 addressable memory combinators will be added to the blueprint.
+define the named constants `foo` to 0, `bar` to 1, `heap` to 2, `stack` to 12 and `memsize` to 16, their offsets in RAM. The numerical expression after the name specifies the size, not the value of the name. The order of the `.global` lines matter internally, but they are also hoisted and the constants can be used before or after, the value after the identifier becomes the sum of all `.global` expressions before it. With no numerical expression the size defaults to 1. Since the sum of all `.global` sizes is 16, a RAM circuit with 16 addressable memory combinators will be added to the blueprint.
 
 ### Directive `.rom` (WIP)
 
@@ -169,6 +173,7 @@ Lines starting with `:` followed by just an identifier define a label (to a valu
     - Improved error handling and reporting.
     - 2D layout (multiple columns) so that you can actually find a space where a large program fits.
     - [v] ~~Fix cli to accept stdin and file parameter~~
+    - [v] ~~Make label definitions inside macros possible~~
 - New language features
     - Memory mapped IO language support
     - Language features for connecting multiple parallel execution units (with their own instruction pointers) that can communicate with eachother through memory.
